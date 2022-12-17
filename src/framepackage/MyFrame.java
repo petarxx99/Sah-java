@@ -1,5 +1,6 @@
 package src.framepackage;
 
+import src.communication.MoveSender;
 import src.paketfigure.Figure;
 import src.paketpolje.Polje;
 import src.raznefigure.*;
@@ -10,8 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
-import src.framepackage.InstanciranjeFrejma.*;
 
 public class MyFrame extends JFrame implements ActionListener {
 

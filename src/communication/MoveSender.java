@@ -1,4 +1,4 @@
-package src.framepackage;
+package src.communication;
 
 import src.paketfigure.*;
 import src.framepackage.InstanciranjeFrejma.*;

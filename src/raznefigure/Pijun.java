@@ -2,12 +2,6 @@ package src.raznefigure;
 
 import src.paketfigure.Figure;
 import src.framepackage.*;
-import src.raznefigure.*;
-import src.framepackage.MoveSender.*;
-import src.framepackage.MyFrame.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
 
 
 // ---------------------------------------------------------------------

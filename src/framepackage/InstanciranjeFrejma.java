@@ -1,14 +1,11 @@
 package src.framepackage;
 
-import src.paketfigure.Figure;
-import src.paketpolje.Polje;
-import src.raznefigure.*;
+import src.communication.MoveSender;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.*;
 
 

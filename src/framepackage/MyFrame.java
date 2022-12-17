@@ -1,6 +1,8 @@
 package src.framepackage;
 
+import src.communication.Move;
 import src.communication.MoveSender;
+import src.communication.Promotion;
 import src.paketfigure.Figure;
 import src.paketpolje.Polje;
 import src.raznefigure.*;
@@ -83,7 +85,8 @@ public class MyFrame extends JFrame implements ActionListener {
     public boolean moveWasPlayed = false;
     public boolean promotionHappened = false;
     public boolean promotionButtonClicked = false;  // SKLONI DUGMICE PROMOCIJE METODA GA MENJA
-    public byte promotionButtonNumber = -1;
+    public Promotion promotionButtonNumber = Promotion.NO_PROMOTION;
+    PromotionThread promotionThread;
 
     // konstruktor
     public MyFrame(InstanciranjeFrejma instanciranjeFrejma, MoveSender moveSender) {
@@ -161,9 +164,10 @@ public class MyFrame extends JFrame implements ActionListener {
                               break;
                           }
                           boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
+                          final boolean PROMOTION_HAS_OCCURED = promotionHappened;
                           labelObavestenja();
                           if (myOpponent != Opponents.HUMAN_ON_THIS_PC){
-                                sendAndReceiveMove(moveWasPlayed, promotionHappened);
+                                sendAndReceiveMove(moveWasPlayed, PROMOTION_HAS_OCCURED);
                           }
                    }
                 }
@@ -185,19 +189,19 @@ public class MyFrame extends JFrame implements ActionListener {
 
         // SLEDI KOD ZA PROMOCIJU PESAKA -----------------------------------------------------------
         
-        if(actionEvent.getSource() == dugmiciPromocije[0]){
+        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_QUEEN]){
             promoteQueen();
         }
-        
-        if(actionEvent.getSource() == dugmiciPromocije[1]){
+
+        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_ROOK]){
             promoteRook();
         }
         
-        if(actionEvent.getSource() == dugmiciPromocije[2]){
+        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_BISHOP]){
             promoteBishop();
         }
         
-        if(actionEvent.getSource() == dugmiciPromocije[3]){
+        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_KNIGHT]){
             promoteKnight();
         }
 
@@ -206,9 +210,12 @@ public class MyFrame extends JFrame implements ActionListener {
     // ACTION PERFORMED KONTROLISANJE DUGMICA SE ZAVRSAVA OVDE ---------------------------------------------
     // ------------------------------------------------------------------------------------------------------
 
-    public void obavestiDaJePromocijaGotova(){
+    public void obavestiDaJePromocijaGotova(Promotion promotion){
         promotionButtonClicked = true;
         choosingPromotionPiece = false;
+        if(myOpponent != Opponents.HUMAN_ON_THIS_PC) {
+            moveSender.promotionHasOccured(promotion);
+        }
     }
 
     public void skloniDugmicePromocije(){
@@ -218,7 +225,7 @@ public class MyFrame extends JFrame implements ActionListener {
     }
 
     public void promoteQueen(){
-        promotionButtonNumber = 0;
+        promotionButtonNumber = Promotion.PROMOTE_QUEEN;
         for(int i=8; i<16; i++){
             if(figura[koJeNaPotezu][i].getRank() == (8 - 7*koJeNaPotezu)){
                 int cuvajRank = figura[koJeNaPotezu][i].getRank();
@@ -233,11 +240,11 @@ public class MyFrame extends JFrame implements ActionListener {
             }
         }
         
-        krajPromocije();
+        krajPromocije(Promotion.PROMOTE_QUEEN);
     }
 
     public void promoteRook(){
-        promotionButtonNumber = 1;
+        promotionButtonNumber = Promotion.PROMOTE_ROOK;
         for(int i=8; i<16; i++){
             if(figura[koJeNaPotezu][i].getRank() == (8 - 7*(koJeNaPotezu))){
                 int cuvajRank = figura[koJeNaPotezu][i].getRank();
@@ -252,11 +259,11 @@ public class MyFrame extends JFrame implements ActionListener {
             }
         }
         
-        krajPromocije();
+        krajPromocije(Promotion.PROMOTE_ROOK);
     }
 
     public void promoteBishop(){
-        promotionButtonNumber = 2;
+        promotionButtonNumber = Promotion.PROMOTE_BISHOP;
         for(int i=8; i<16; i++){
             if(figura[koJeNaPotezu][i].getRank() == (8 - 7*(koJeNaPotezu))){
                 int cuvajRank = figura[koJeNaPotezu][i].getRank();
@@ -272,11 +279,11 @@ public class MyFrame extends JFrame implements ActionListener {
             }
         }
         
-        krajPromocije();
+        krajPromocije(Promotion.PROMOTE_BISHOP);
     }
 
     public void promoteKnight(){
-        promotionButtonNumber = 3;
+        promotionButtonNumber = Promotion.PROMOTE_KNIGHT;
         for(int i=8; i<16; i++){
             if(figura[koJeNaPotezu][i].getRank() == (8 - 7*(koJeNaPotezu))){
                 int cuvajRank = figura[koJeNaPotezu][i].getRank();
@@ -292,16 +299,16 @@ public class MyFrame extends JFrame implements ActionListener {
             }
         }
         
-        krajPromocije();  
+        krajPromocije(Promotion.PROMOTE_KNIGHT);
     }
 
 
-    private void krajPromocije(){
+    private void krajPromocije(Promotion promotion){
         updateIstorijaPolozajaFigura();
         koJeNaPotezu = Figure.invert(koJeNaPotezu);
         brojPoteza++;
         skloniDugmicePromocije();
-        obavestiDaJePromocijaGotova();
+        obavestiDaJePromocijaGotova(promotion);
         labelObavestenja();
     }
     
@@ -356,26 +363,48 @@ public class MyFrame extends JFrame implements ActionListener {
         moveWasPlayed = false; // Resetujem ovu promenljivu.
         promotionHappened = false; // Resetujem ovu promenljivu. obavestiDaJePromocija gotova metoda menja ovu promenljivu. Nekad ju je menjala metoda Skloni dugmice promocije.
         promotionButtonClicked = false; // Resetujem ovu promenljivu. obavestiDaJePromocija gotova metoda menja ovu promenljivu. Nekad ju je menjala metoda Skloni dugmice promocije.
-        promotionButtonNumber = -1;  //Resetujem ovu promenljivu. promoteQueen/Rook/Bishop/Knight metode menjaju ovu promenljivu.          
+        promotionButtonNumber = Promotion.NO_PROMOTION;  //Resetujem ovu promenljivu. promoteQueen/Rook/Bishop/Knight metode menjaju ovu promenljivu.
         pijun2PoljaNapredUovomPotezu = false;
         choosingPromotionPiece = false;
    }
-   
-    public void sendAndReceiveMove(boolean moveWasPlayed, boolean promotionHappened){
-         if(promotionHappened){
-                 Thread threadPromotion = new Thread(new PromotionThread(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber, this));
-                 threadPromotion.start();
-         
-         
+
+
+   public void pawnHasReachedTheEndOfBoard(final int START_RANK, final int START_FILE, final int END_RANK, final int END_FILE){
+       choosingPromotionPiece = true;
+       promotionHappened = true;
+       //  boardFrame.filePromovisanogPijuna = (byte)file;
+       for(int i=0; i<4; i++){
+           dugmiciPromocije[i].setVisible(true);
+           System.out.println("Showing promotion buttons.");
+       }
+   }
+
+    private void sendAndReceiveMove(boolean moveWasPlayed, boolean promotionHasOccured){
+        System.out.println("sendAndReceive: " + promotionHasOccured);
+         if(promotionHasOccured){
+                 moveSender.waitForPromotionAndThenSendMove(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber);
          } else if (moveWasPlayed) {
-                 Thread threadGetAndSendMove = new Thread(()->moveSender.getAndSendMove(startRank, startFile, destinationRank, destinationFile, -1));
+                 Thread threadGetAndSendMove = new Thread(() -> sendAndReceiveMoveWithoutWaitingForPromotion(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber));
                  threadGetAndSendMove.start();
+
         }
                                                 
     }
     
-    
-    
+    private void sendAndReceiveMoveWithoutWaitingForPromotion(final byte START_RANK, final byte START_FILE, final byte END_RANK, final byte END_FILE, Promotion promotion){
+        try{
+            moveSender.getAndSendMove(START_RANK, START_FILE, END_RANK, END_FILE, promotion);
+        }catch(Exception e){
+            e.getMessage();
+            e.printStackTrace();
+        }
+    }
+
+    public void moveIsSentToOpponent(){
+        this.labelCijiPotez.setText("Protivnik je na potezu.");
+    }
+
+
     private boolean shouldIbreakTheLoop(){
          // Ukoliko igram protiv nekog sa drugog kompjutera, onda ne mogu ja da povucem njegov potez.
 // Za to se brine sledeca linija koda.
@@ -395,8 +424,94 @@ public class MyFrame extends JFrame implements ActionListener {
                     
                     return output;
     }
-    
-    
+
+    public int findPieceIndex(int rank, int file, int whoseTurnItIs){
+        int position = rank * 10 + file;
+
+        for(int i=0; i<16; i++){
+            if(figura[whoseTurnItIs][i].getPozicija() == position){
+                return i;
+            }
+        }
+        return -1; // Nesto nije bilo kako treba.
+    }
+
+    public void playOpponentsMove(Move aMove){
+        if(aMove.PROMOTION == Promotion.NO_PROMOTION){
+            playANONPromotingMove(aMove);
+        } else {
+            playPromotingMove(aMove);
+        }
+
+        ovoJePoljeDestinacije = false;
+        //updateIstorijaPolozajaFigura();
+        koJeNaPotezu = Figure.invert(koJeNaPotezu);
+        brojPoteza++;
+        labelObavestenja();
+    }
+
+    private void playANONPromotingMove(Move aMove){
+        final boolean PIECE_WAS_CAPTURED = (new Figure()).skloniFiguruSaTable(aMove.END_RANK, aMove.END_FILE, this);
+        final int PIECE_INDEX = findPieceIndex(aMove.START_RANK, aMove.START_FILE, koJeNaPotezu);
+        // Zbog en passant ovo pisem, promenljiva se menja u kodu move pijuna, ako se pijun pomeri dva polja napred.
+        pijun2PoljaNapredUovomPotezu = false;
+        boolean moveWasPlayed = figura[koJeNaPotezu][PIECE_INDEX].Move(aMove.END_RANK, aMove.END_FILE, this);
+        if(!moveWasPlayed){
+            opponentsMoveWasntPlayed(aMove);
+        }
+        if(!pijun2PoljaNapredUovomPotezu){
+            filePijunaKojiSePomerio2Polja = MyFrame.INVALID_FILE;
+        }
+
+    }
+
+    private void opponentsMoveWasntPlayed(Move aMove){}
+    public byte getColorOfPlayerWhoDoesntHaveTheTurn(){
+        if(koJeNaPotezu == 0) return (byte)1;
+        if(koJeNaPotezu == 1) return (byte)0;
+        return (byte)-1;
+    }
+    private void playPromotingMove(Move aMove){
+        int whoseTurnItIs = getKoJeNaPotezu();
+        int pieceIndex = findPieceIndex(aMove.START_RANK, aMove.START_FILE, whoseTurnItIs);
+
+        boolean pieceWasCaptured = (new Figure()).skloniFiguruSaTable(
+                aMove.END_RANK,
+                aMove.END_FILE, this);
+
+        this.figura[whoseTurnItIs][pieceIndex].setPozicija(
+                aMove.END_FILE,
+                aMove.END_RANK, this);
+
+        this.filePijunaKojiSePomerio2Polja = MyFrame.INVALID_FILE;
+
+        switch (aMove.PROMOTION) {
+            case PROMOTE_QUEEN: {
+                this.promoteQueen();
+                break;
+            }
+            case PROMOTE_ROOK: {
+                this.promoteRook();
+                break;
+            }
+            case PROMOTE_BISHOP: {
+                this.promoteBishop();
+                break;
+            }
+            case PROMOTE_KNIGHT: {
+                this.promoteKnight();
+                break;
+            }
+
+            default: {
+            }
+        }
+    }
+
+    public void receiveOpponentsMove(Move aMove){
+        playOpponentsMove(aMove);
+    }
+
     public void updateIstorijaPolozajaFigura(){
         for(int i=0; i<2; i++){
             for(int j=0; j<16; j++){

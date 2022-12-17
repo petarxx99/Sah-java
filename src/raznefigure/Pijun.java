@@ -109,13 +109,7 @@ public class Pijun extends Figure {
 // u principu treba nam funkcija f(0) = 8, f(1) = 1. Ovo je najjednostavnija koju sam ja iz proslosti smislio.
 
                 if(this.rank == (8 - 7*(boardFrame.getKoJeNaPotezu()))){
-                    boardFrame.choosingPromotionPiece = true;
-                    boardFrame.promotionHappened = true;
-                  //  boardFrame.filePromovisanogPijuna = (byte)file;
-                    for(int i=0; i<4; i++){
-                        boardFrame.dugmiciPromocije[i].setVisible(true);
-                        System.out.println("Showing promotion buttons.");
-                    }
+                    boardFrame.pawnHasReachedTheEndOfBoard(this.rank, this.file, rank, file);
                     return true;
                 }
 

@@ -1,30 +1,48 @@
 package src.framepackage;
 
-public class PromotionThread implements Runnable {
-    byte[] moveInfo = new byte[5];
-    MyFrame boardFrame;
+import src.communication.MoveSender;
+import src.communication.Promotion;
 
-    public PromotionThread(int startRank, int startFile, int destinationRank, int destinationFile, int promotionButtonNumber, MyFrame boardFrame){
-        moveInfo[0] = (byte) startRank;
-        moveInfo[1] = (byte) startFile;
-        moveInfo[2] = (byte) destinationRank;
-        moveInfo[3] = (byte) destinationFile;
-        moveInfo[4] = (byte) promotionButtonNumber;
-        this.boardFrame = boardFrame;
+public class PromotionThread implements Runnable {
+    final byte START_RANK, START_FILE, END_RANK, END_FILE;
+    MoveSender moveSender;
+    Promotion promotion;
+    private boolean stopThread = false;
+
+
+    private boolean promotionHasOccured = false;
+    public void promotionHasOccured(Promotion promotion){
+        promotionHasOccured = true;
+        this.promotion = promotion;
+    }
+
+
+    public PromotionThread(int startRank, int startFile, int destinationRank, int destinationFile, Promotion promotion, MoveSender moveSender){
+        START_RANK = (byte) startRank;
+        START_FILE = (byte) startFile;
+        END_RANK = (byte) destinationRank;
+        END_FILE = (byte) destinationFile;
+        this.promotion = promotion;
+        this.moveSender = moveSender;
 
     }
     @Override
     public void run(){
 
         try{
-            while(!boardFrame.promotionButtonClicked){
+            while(!promotionHasOccured){
                 Thread.sleep(50);
+                if(stopThread) return;
             }
-            boardFrame.moveSender.getAndSendMove(moveInfo[0], moveInfo[1], moveInfo[2], moveInfo[3], boardFrame.promotionButtonNumber);
-        } catch(InterruptedException error){
+            moveSender.getAndSendMove(START_RANK, START_FILE, END_RANK, END_FILE, promotion);
+        } catch(Exception error){
             error.printStackTrace();
+            error.getMessage();
         }
     }
 
+    public void stopThread(){
+       stopThread = true;
+    }
 
 }

@@ -180,17 +180,19 @@ public class Figure extends JLabel {
 
 
 
-    public void skloniFiguruSaTable(int rank, int file, MyFrame boardFrame){
+    public boolean skloniFiguruSaTable(int rank, int file, MyFrame boardFrame){
         for(int i=0; i<2; i++){
             for(int j=0; j<16; j++){
                 if(boardFrame.figura[i][j].getRank() == rank){
                     if(boardFrame.figura[i][j].getFile() == file){
                         boardFrame.figura[i][j].setBounds((duzinaTable+odIvice), 0, duzinaFigure, duzinaFigure);
                         boardFrame.figura[i][j].setRankFile(9,99);
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
 

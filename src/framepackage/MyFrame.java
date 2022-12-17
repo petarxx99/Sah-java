@@ -166,7 +166,7 @@ public class MyFrame extends JFrame implements ActionListener {
                           boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
                           final boolean PROMOTION_HAS_OCCURED = promotionHappened;
                           labelObavestenja();
-                          if (myOpponent != Opponents.HUMAN_ON_THIS_PC){
+                          if (moveSender.opponent != Opponents.HUMAN_ON_THIS_PC){
                                 sendAndReceiveMove(moveWasPlayed, PROMOTION_HAS_OCCURED);
                           }
                    }
@@ -213,7 +213,7 @@ public class MyFrame extends JFrame implements ActionListener {
     public void obavestiDaJePromocijaGotova(Promotion promotion){
         promotionButtonClicked = true;
         choosingPromotionPiece = false;
-        if(myOpponent != Opponents.HUMAN_ON_THIS_PC) {
+        if(moveSender.opponent != Opponents.HUMAN_ON_THIS_PC) {
             moveSender.promotionHasOccured(promotion);
         }
     }
@@ -380,7 +380,6 @@ public class MyFrame extends JFrame implements ActionListener {
    }
 
     private void sendAndReceiveMove(boolean moveWasPlayed, boolean promotionHasOccured){
-        System.out.println("sendAndReceive: " + promotionHasOccured);
          if(promotionHasOccured){
                  moveSender.waitForPromotionAndThenSendMove(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber);
          } else if (moveWasPlayed) {
@@ -410,7 +409,7 @@ public class MyFrame extends JFrame implements ActionListener {
 // Za to se brine sledeca linija koda.
                     boolean output = false;
                     
-                    if((myOpponent != Opponents.HUMAN_ON_THIS_PC)  && (koJeNaPotezu == moveSender.opponentsColor)) {
+                    if((moveSender.opponent != Opponents.HUMAN_ON_THIS_PC)  && (koJeNaPotezu == moveSender.opponentsColor)) {
                         System.out.println("Sada je protivnikov potez.");
                         System.out.println("Na potezu je = " + koJeNaPotezu);
                         System.out.println("Protivnik ima boju = " + moveSender.opponentsColor);

@@ -57,6 +57,7 @@ public class MoveSender {
             case PLAYER_ON_ANOTHER_PC: {
                 sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
                 boardFrame.moveIsSentToOpponent();
+                System.out.printf("The move that was sent: %s \n", moveToSend.toString());
                 receiveMove();
                 break;
             }
@@ -143,8 +144,8 @@ public class MoveSender {
             bos.write(move);
             bos.close();
            // socketSend.close();
-            System.out.println("Slanje zavrseno.");
-            System.out.printf("Sent move: %d-%d-%d \n", move[0], move[1], move[2]);
+            System.out.println("The move is sent.");
+
         } catch(IOException e){
             e.printStackTrace();
         }

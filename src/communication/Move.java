@@ -51,9 +51,8 @@ public class Move {
     }
     @Override
     public String toString(){
-        return "start rank: " + START_RANK +"\n"+
-                "start file: " + fileAsLetter(START_FILE) + "\n"+
-                "end rank: " + END_RANK + "\n"+
-                "end file: " + fileAsLetter(END_FILE);
+        return "start square: " + fileAsLetter(START_FILE) + START_RANK + "\n"+
+                "end square: " + fileAsLetter(END_FILE) + END_RANK + "\n"+
+                "promotion: " + PROMOTION.toString();
     }
 }

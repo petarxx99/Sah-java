@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.*;
 
 public class MoveSender {
-    public MyFrame boardFrame;
+    public ReceiverOfChessMoves receiverOfMoves;
     public Opponents opponent;
     private MoveEncoder moveEncoder;
     public String opponentIpAddress, myIpAddress;
@@ -56,7 +56,7 @@ public class MoveSender {
         switch (opponent){
             case PLAYER_ON_ANOTHER_PC: {
                 sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
-                boardFrame.moveIsSentToOpponent();
+                receiverOfMoves.moveIsSentToOpponent(moveToSend);
                 System.out.printf("The move that was sent: %s \n", moveToSend.toString());
                 receiveMove();
                 break;
@@ -84,12 +84,12 @@ public class MoveSender {
         }
     }
 
-    public void setInfo(String opponentIpAddress, int opponentPort, String myIpAddress, int myPort, MyFrame boardFrame){
+    public void setInfo(String opponentIpAddress, int opponentPort, String myIpAddress, int myPort, ReceiverOfChessMoves receiverOfMoves){
         this.opponentIpAddress = opponentIpAddress;
         this.opponentPort = opponentPort;
         this.myIpAddress = myIpAddress;
         this.myPort = myPort;
-        this.boardFrame = boardFrame;
+        this.receiverOfMoves = receiverOfMoves;
     }
 
     public void setOpponentIpAddress(String opponentIpAddress){
@@ -120,7 +120,7 @@ public class MoveSender {
 
             Move aMove = moveEncoder.decodeMove(opponentMove);
             System.out.printf("Received move: %s \n", aMove.toString());
-            boardFrame.receiveOpponentsMove(aMove);
+            receiverOfMoves.receiveOpponentsMove(aMove);
 
         } catch(IOException e){
             e.printStackTrace();

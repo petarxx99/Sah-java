@@ -3,6 +3,7 @@ package src.framepackage;
 import src.communication.Move;
 import src.communication.MoveSender;
 import src.communication.Promotion;
+import src.communication.ReceiverOfChessMoves;
 import src.paketfigure.Figure;
 import src.paketpolje.Polje;
 import src.raznefigure.*;
@@ -14,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class MyFrame extends JFrame  {
+public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
     // karakteristike table
     public int duzinaPolja;
@@ -362,7 +363,8 @@ public class MyFrame extends JFrame  {
         }
     }
 
-    public void moveIsSentToOpponent(){
+    @Override
+    public void moveIsSentToOpponent(Move aMove){
         this.labelCijiPotez.setText("Protivnik je na potezu.");
     }
 
@@ -470,6 +472,7 @@ public class MyFrame extends JFrame  {
         }
     }
 
+    @Override
     public void receiveOpponentsMove(Move aMove){
         playOpponentsMove(aMove);
     }

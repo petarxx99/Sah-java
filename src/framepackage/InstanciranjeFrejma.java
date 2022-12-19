@@ -1,6 +1,8 @@
 package src.framepackage;
 
 import src.communication.MoveSender;
+import src.communication.encoding.MoveEncoder;
+import src.communication.encoding.MoveEncoder3bytes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +65,8 @@ public class InstanciranjeFrejma implements ActionListener{
             }
         }
 
-        MoveSender moveSender = new MoveSender(thisClass.opponent);
+        MoveEncoder moveEncoder = new MoveEncoder3bytes();
+        MoveSender moveSender = new MoveSender(thisClass.opponent, moveEncoder);
         moveSender.opponentsColor = thisClass.opponentsColor;
 
         MyFrame frejm1 = new MyFrame(thisClass, moveSender);

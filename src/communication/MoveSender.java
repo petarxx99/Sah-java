@@ -1,5 +1,6 @@
 package src.communication;
 
+import src.communication.encoding.MoveEncoder;
 import src.paketfigure.*;
 import src.framepackage.InstanciranjeFrejma.*;
 import src.framepackage.MyFrame.*;
@@ -11,6 +12,7 @@ import java.util.*;
 public class MoveSender {
     public MyFrame boardFrame;
     public Opponents opponent;
+    private MoveEncoder moveEncoder;
     public String opponentIpAddress, myIpAddress;
     public int opponentPort, myPort;
     public byte opponentsColor = 1;
@@ -18,8 +20,7 @@ public class MoveSender {
 
     PromotionThread promotionThread;
 
-    public static final byte NO_PROMOTION = -1, PROMOTE_QUEEN = 0, PROMOTE_ROOK = 1, PROMOTE_BISHOP = 2, PROMOTE_KNIGHT = 3;
-    public static final byte ERROR = Byte.MIN_VALUE;
+
 
    /* I chose this design because this way new promotionThread is created for every new promotion move.
    * This way the variable that holds the information about whether promotion has occurred or not is in
@@ -43,40 +44,18 @@ public class MoveSender {
         promotionThread.promotionHasOccured(promotion);
     }
 
-    private static byte encodePromotion(Promotion promotion){
-        switch (promotion){
-            case NO_PROMOTION: return NO_PROMOTION;
-            case PROMOTE_QUEEN: return PROMOTE_QUEEN;
-            case PROMOTE_ROOK:  return PROMOTE_ROOK;
-            case PROMOTE_BISHOP: return PROMOTE_BISHOP;
-            case PROMOTE_KNIGHT: return PROMOTE_KNIGHT;
-            default: return NO_PROMOTION;
-        }
-    }
-    private static Promotion decodePromotion(byte promotionByte){
-        switch(promotionByte){
-            case NO_PROMOTION: return Promotion.NO_PROMOTION;
-            case PROMOTE_QUEEN: return Promotion.PROMOTE_QUEEN;
-            case PROMOTE_ROOK: return Promotion.PROMOTE_ROOK;
-            case PROMOTE_BISHOP: return Promotion.PROMOTE_BISHOP;
-            case PROMOTE_KNIGHT: return Promotion.PROMOTE_KNIGHT;
-            default: return Promotion.NO_PROMOTION;
-        }
-    }
 
     public void getAndSendMove(int startRank, int startFile, int endRank, int endFile, Promotion promotion) throws Exception {
         if(promotion == null){
             throw new Exception("Promotion is null.");
         }
 
-        byte[] move = new byte[3];
-        move[0] = (byte) (startRank * 10 + startFile);
-        move[1] = (byte) (endRank * 10 + endFile);
-        move[2] = encodePromotion(promotion);
+        Move moveToSend = new Move(startRank, startFile, endRank, endFile, promotion);
+        byte[] encodedMoveToSend = moveEncoder.encodeMove(moveToSend);
 
         switch (opponent){
             case PLAYER_ON_ANOTHER_PC: {
-                sendMove(move, opponentIpAddress, opponentPort);
+                sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
                 boardFrame.moveIsSentToOpponent();
                 receiveMove();
                 break;
@@ -125,7 +104,7 @@ public class MoveSender {
 
 
     public void receiveMove(){
-        byte[] opponentMove = new byte[3];
+        byte[] opponentMove = moveEncoder.createBufferForTheMove();
         try {
 
             System.out.println("Waiting for opponent's move.");
@@ -137,21 +116,11 @@ public class MoveSender {
 
             bis.close();
             socketReceive.close();
-            System.out.printf("Received move: %d-%d-%d \n", opponentMove[0], opponentMove[1], opponentMove[2]);
 
-            int startRank = opponentMove[0] / 10;
-            int startFile = opponentMove[0] % 10;
-            int endRank = opponentMove[1] / 10;
-            int endFile = opponentMove[1] % 10;
-            Promotion promotion = decodePromotion(opponentMove[2]);
+            Move aMove = moveEncoder.decodeMove(opponentMove);
+            System.out.printf("Received move: %s \n", aMove.toString());
+            boardFrame.receiveOpponentsMove(aMove);
 
-            try{
-                Move aMove = new Move(startRank, startFile, endRank, endFile, promotion);
-                boardFrame.receiveOpponentsMove(aMove);
-            }catch (Exception e){
-                e.getMessage();
-                e.printStackTrace();
-            }
         } catch(IOException e){
             e.printStackTrace();
         }
@@ -181,20 +150,15 @@ public class MoveSender {
         }
     }
 
-    public int findPieceIndex(int rank, int file, int whoseTurnItIs){
-        int position = rank * 10 + file;
-
-        for(int i=0; i<16; i++){
-            if(boardFrame.figura[whoseTurnItIs][i].getPozicija() == position){
-                return i;
-            }
-        }
-        return -1; // Nesto nije bilo kako treba.
-    }
 
     public MoveSender(){}
     public MoveSender(Opponents opponent){
         this.opponent = opponent;
+    }
+
+    public MoveSender(Opponents opponent, MoveEncoder moveEncoder){
+        this.opponent = opponent;
+        this.moveEncoder = moveEncoder;
     }
 
 

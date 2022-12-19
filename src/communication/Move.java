@@ -44,4 +44,16 @@ public class Move {
     private boolean isItLessThan8BiggerThan1(int number){
         return number>=1 && number<=8;
     }
+
+    private static byte LETTER_a = 97;
+    private static char fileAsLetter(byte rank){
+        return (char) (rank + LETTER_a-1);
+    }
+    @Override
+    public String toString(){
+        return "start rank: " + START_RANK +"\n"+
+                "start file: " + fileAsLetter(START_FILE) + "\n"+
+                "end rank: " + END_RANK + "\n"+
+                "end file: " + fileAsLetter(END_FILE);
+    }
 }

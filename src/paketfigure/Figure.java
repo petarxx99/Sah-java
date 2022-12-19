@@ -49,7 +49,7 @@ public class Figure extends JLabel {
     }
 
     public Figure(MyFrame boardFrame, ArrayList<Integer> istorijaPolozaja) {
-        this.duzinaPolja = boardFrame.instanciranjeFrejma.duzinaPolja;
+        this.duzinaPolja = boardFrame.duzinaPolja;
         initDimenzije();
         this.istorijaPolozaja = istorijaPolozaja;
         bioSamPijunKogFajla = istorijaPolozaja.get(0) % 10;
@@ -62,7 +62,7 @@ public class Figure extends JLabel {
         } else {
             this.bojaFigure = 0;
         }
-        this.duzinaPolja = boardFrame.instanciranjeFrejma.duzinaPolja;
+        this.duzinaPolja = boardFrame.duzinaPolja;
         initDimenzije();
         this.setOpaque(true);
         this.setVisible(true);
@@ -93,7 +93,7 @@ public class Figure extends JLabel {
 
     public void setPozicija(MyFrame boardFrame) {
         //this.setBounds(getXkoordinata(), getYkoordinata(), duzinaFigure, duzinaFigure);
-        if(boardFrame.instanciranjeFrejma.whitesPerspective)
+        if(boardFrame.whitesPerspective)
             this.setBounds(duzinaPolja * (file -1) + odIvice, duzinaTable - rank * duzinaPolja + odIvice, duzinaFigure, duzinaFigure);
         else
             this.setBounds(duzinaTable - duzinaPolja * file + odIvice, duzinaPolja * (rank-1) + odIvice, duzinaFigure, duzinaFigure);

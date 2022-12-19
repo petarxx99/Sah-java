@@ -11,7 +11,7 @@ public class Pijun extends Figure {
     public Pijun() {
     }
     public Pijun(MyFrame boardFrame) {
-        this.duzinaPolja = boardFrame.instanciranjeFrejma.duzinaPolja;
+        this.duzinaPolja = boardFrame.duzinaPolja;
         initDimenzije();
     }
 

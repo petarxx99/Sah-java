@@ -18,7 +18,7 @@ public class Kralj extends Figure {
     }
 
     public Kralj(MyFrame boardFrame) {
-        this.duzinaPolja = boardFrame.instanciranjeFrejma.duzinaPolja;
+        this.duzinaPolja = boardFrame.duzinaPolja;
         initDimenzije();
     }
 

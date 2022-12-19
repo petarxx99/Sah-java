@@ -14,12 +14,7 @@ import java.util.*;
 
 
 public class InstanciranjeFrejma {
-    public final static byte DEFAULT_PC = 0, PC_FROM_THE_LIST = 1, CUSTOM_IP_AND_PORT = 2;
-    public byte whichPC = DEFAULT_PC;
 
-    public int duzinaPolja;
-
-    public boolean da_li_da_obavestim_da_je_igrac_u_sahu = false;
     private boolean colorQuestionAnswered = false, opponentQAnswered, pcQuestion;
     boolean askWhichPCAnswered = false;
     static JButton buttonWhite, buttonBlack, buttonDefaultOption;
@@ -28,12 +23,7 @@ public class InstanciranjeFrejma {
     JButton buttonUnesiSamOption;
     JTextField ipTextField;
 
-    public byte opponentsColor;
-    public Opponents opponent;
-    public boolean whitesPerspective;
-    public String opponentIp;
-    public int opponentPort = 5000;
-    public int myPort = 5000;
+
 
     public static HashMap<String, String> opponentsHashMap = new HashMap<>() {
         {
@@ -46,41 +36,49 @@ public class InstanciranjeFrejma {
 
     public InstanciranjeFrejma(int duzinaPolja){
 
-        this.duzinaPolja = duzinaPolja;
+        Byte opponentsColor = askWhiteOrBlackPieces();
+        boolean whitesPerspective = opponentsColor == ChessConstants.BLACK_TO_MOVE;
 
-        this.askWhiteOrBlackPieces();
+        Opponents opponent = askAgainstWhomYouPlay();
+        int opponentPort = 5000, myPort = 5000;
+        String opponentIpAddress = "localhost";
 
-        this.askAgainstWhomYouPlay();
-
-        switch (this.opponent) {
-            case CHESS_ENGINE: {
-                this.opponentPort = 5003;
+        switch(opponent){
+            case CHESS_ENGINE:{
+                opponentPort = 6000;
+                myPort = 5000;
+                opponentIpAddress = "localhost";
                 break;
             }
-            case PLAYER_ON_ANOTHER_PC: {
-                this.askWhichPC();
-                if (this.whichPC == CUSTOM_IP_AND_PORT){
-                    this.askForOpponentIP();
+            case PLAYER_ON_ANOTHER_PC:{
+                WhichPcEnum whichPc = askWhichPC();
+                if(whichPc == WhichPcEnum.CUSTOM_IP_AND_PORT){
+                    IpAddressAndPortData ipPort = askForOpponentIP();
+                    opponentIpAddress = ipPort.opponentsIpAddress;
+                    myPort = ipPort.myPort;
+                    opponentPort = ipPort.opponentsPort;
                 }
                 break;
             }
+            default:{}
         }
 
         MoveEncoder moveEncoder = new MoveEncoder3bytes();
-        MoveSender moveSender = new MoveSender(this.opponent, moveEncoder, this.opponentsColor);
+        MoveSender moveSender = new MoveSender(opponent, moveEncoder, opponentsColor);
 
         MyFrame frejm1 = new MyFrame();
-        initMoveSender(moveSender, frejm1);
-        frejm1.init(this, moveSender);
+        initMoveSender(moveSender, frejm1, opponentIpAddress, opponentPort, myPort, opponent);
+        frejm1.init(whitesPerspective, duzinaPolja, moveSender);
     }
 
-    private void initMoveSender(MoveSender moveSender, ReceiverOfChessMoves receiverOfChessMoves){
-        if(this.opponent != Opponents.HUMAN_ON_THIS_PC){
+    private void initMoveSender(MoveSender moveSender, ReceiverOfChessMoves receiverOfChessMoves,
+                                String opponentIp, int opponentPort, int myPort, Opponents opponent){
+        if(opponent != Opponents.HUMAN_ON_THIS_PC){
             moveSender.init(
-                    this.opponentIp,
-                    this.opponentPort,
+                    opponentIp,
+                    opponentPort,
                     "localhost",
-                    this.myPort,
+                    myPort,
                     receiverOfChessMoves);
 
 // Ako igram crnog, onda moram da dobijem prvi potez od igraca sa drugog kompjutera.
@@ -91,7 +89,7 @@ public class InstanciranjeFrejma {
         }
     }
 
-    public void askWhiteOrBlackPieces(){
+    public Byte askWhiteOrBlackPieces(){
 
         JFrame framePerspective = new JFrame();
         framePerspective.setLayout(null);
@@ -107,20 +105,19 @@ public class InstanciranjeFrejma {
         labelPitanje.setOpaque(true);
 
         InstanciranjeFrejma thisClass = this;
+        OpponentsColor colorOfTheOpponent = new OpponentsColor();
 
         buttonWhite = new JButton("WHITE/BELI");
         buttonWhite.setBounds(20, 300, 200, 50);
-        buttonWhite.addActionListener(actionEvent -> {
-            whitesPerspective = true;
-            opponentsColor = MyFrame.BLACK_PIECES;
-            colorQuestionAnswered = true;
+        buttonWhite.addActionListener(actionEvent ->{
+                        colorOfTheOpponent.colorOfTheOpponent = ChessConstants.BLACK_TO_MOVE;
+                        colorQuestionAnswered = true;
         });
 
         buttonBlack = new JButton("BLACK/CRNI");
         buttonBlack.setBounds(280, 300, 200, 50);
         buttonBlack.addActionListener(actionEvent -> {
-            whitesPerspective = false;
-            opponentsColor = MyFrame.WHITE_PIECES;
+            colorOfTheOpponent.colorOfTheOpponent = ChessConstants.WHITE_TO_MOVE;
             colorQuestionAnswered = true;
         });
         
@@ -134,16 +131,20 @@ public class InstanciranjeFrejma {
             while(true) {
                 if (colorQuestionAnswered) {
                     framePerspective.dispose();
-                    break;
+                    return colorOfTheOpponent.colorOfTheOpponent;
                 }
                 Thread.sleep(200);
             }
         } catch(InterruptedException e){
             e.printStackTrace();
+            return null;
         }
     }
 
-    public void askAgainstWhomYouPlay(){
+    static class OpponentsColor{
+        Byte colorOfTheOpponent;
+    }
+    private Opponents askAgainstWhomYouPlay(){
         int buttonHeight = 30;
         int buttonLength = 460;
         int distanceBetweenButtons = 20;
@@ -177,10 +178,15 @@ public class InstanciranjeFrejma {
 
         InstanciranjeFrejma thisClass = this;
 
+        ChosenButtonData buttonThatWasChosen = new ChosenButtonData();
         for(int i=0; i<opponentButtons.size(); i++){
-            opponentButtons.get(i).setBounds(buttonX, firstButtonY * i + buttonHeight + distanceBetweenButtons, buttonLength, buttonHeight);
-            opponentButtons.get(i).addActionListener(thisClass::opponentWasChosen);
-            frameOpponent.add(opponentButtons.get(i));
+            final ChoiceButton opponentButton = opponentButtons.get(i);
+            opponentButton.setBounds(buttonX, firstButtonY * i + buttonHeight + distanceBetweenButtons, buttonLength, buttonHeight);
+            opponentButton.addActionListener(e -> {
+                buttonThatWasChosen.choiceButton = opponentButton;
+                opponentQAnswered = true;
+            });
+            frameOpponent.add(opponentButton);
         }
 
         frameOpponent.add(labelPitanje);
@@ -191,24 +197,21 @@ public class InstanciranjeFrejma {
             while(true){
                 if(opponentQAnswered){
                     frameOpponent.dispose();
-                    break;
+                    return buttonThatWasChosen.choiceButton.getOpponent();
                 }
                 Thread.sleep(200);
             }
         } catch(InterruptedException e){
             e.printStackTrace();
+            return null;
         }
     }
 
-    public void opponentWasChosen(ActionEvent event){
-        ChoiceButton chosenOpponent = opponentButtons.stream().
-                filter(button -> event.getSource() == button)
-                .findFirst().orElseThrow();
-        opponent = chosenOpponent.getOpponent();
-        opponentQAnswered = true;
-    }
 
-    public void askWhichPC(){
+    static class ChosenButtonData{
+        public ChoiceButton choiceButton;
+    }
+    public WhichPcEnum askWhichPC(){
 
         JFrame frameWhichPC = new JFrame();
         frameWhichPC.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -222,15 +225,19 @@ public class InstanciranjeFrejma {
         labelPitanje.setBounds(20, 50, 460, 30);
 
         InstanciranjeFrejma thisClass = this;
+        WhereOpponentPlaysData whereOpponentPlays = new WhereOpponentPlaysData();
 
         buttonDefaultOption = new JButton("Default PC/podrazumevani PC");
         buttonDefaultOption.setBounds(20, 100, 460, 30);
-        buttonDefaultOption.addActionListener(thisClass::opponentOnDefaultPCWasChosen);
+        buttonDefaultOption.addActionListener(e -> {
+            whereOpponentPlays.whichPc = WhichPcEnum.DEFAULT_PC;
+            pcQuestion = true;
+        });
 
         thisClass.buttonUnesiSamOption = new JButton("Unesi sam IP adresu. Enter your own IP address");
         thisClass.buttonUnesiSamOption.setBounds(20, 150, 460, 30);
         thisClass.buttonUnesiSamOption.addActionListener((ActionEvent event)->{
-            whichPC = CUSTOM_IP_AND_PORT;
+            whereOpponentPlays.whichPc = WhichPcEnum.CUSTOM_IP_AND_PORT;
             pcQuestion = true;
         });
 
@@ -246,26 +253,26 @@ public class InstanciranjeFrejma {
             while(!pcQuestion){  // OVAJ DEO ZAUSTAVLJA PROGRAM DOK SE NE IZABERE ODKLE IGRA PROTIVNIK!!!!
                 Thread.sleep(200);
             }
+            frameWhichPC.dispose();
+            return whereOpponentPlays.whichPc;
         } catch(InterruptedException e){
             e.printStackTrace();
+            return null;
         }
 
-        frameWhichPC.dispose();
+
     }
 
-    private void opponentOnDefaultPCWasChosen(ActionEvent event){
-        whichPC = DEFAULT_PC;
-        // opponentIp = opponentsHashMap.get("DEFAULT_PC").split(":")[0];
-        opponentIp = "";
-        opponentPort = 5000;
-        //  opponentPort = Integer.parseInt(opponentsHashMap.get("DEFAULT_PC").split(":")[1]);
-        JOptionPane.showMessageDialog(null, "Podesite default ip adresu u kodu. \n");
-        System.exit(0);
-        pcQuestion = true;
+    static class WhereOpponentPlaysData{
+        WhichPcEnum whichPc;
+    }
+
+    static enum WhichPcEnum{
+        DEFAULT_PC, CUSTOM_IP_AND_PORT;
     }
 
 
-    public void askForOpponentIP(){
+    private IpAddressAndPortData askForOpponentIP(){
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(700, 400);
@@ -287,11 +294,13 @@ public class InstanciranjeFrejma {
 
         InstanciranjeFrejma thisObject = this;
         JButton buttonPotvrdi = new JButton("Porvrdi IP adresu/confirm IP");
+        IpAddressAndPortData dataToReturn = new IpAddressAndPortData();
         buttonPotvrdi.addActionListener((ActionEvent event)-> ipAddressAndPortWereEntered(
                 frame,
                 ipTextField,
                 textFieldOpponentPort,
-                textFieldMojPort));
+                textFieldMojPort,
+                dataToReturn));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -326,13 +335,15 @@ public class InstanciranjeFrejma {
         }
 
         frame.dispose();
+        return dataToReturn;
     }
 
     private void ipAddressAndPortWereEntered(
             JFrame frameThatAskedQuestion,
             JTextField opponentIPtextField,
             JTextField textFieldOpponentPort,
-            JTextField textFieldMojPort){
+            JTextField textFieldMojPort,
+            IpAddressAndPortData dataToReturn){
         frameThatAskedQuestion.setEnabled(false);
 
         String unetaIpAdresa = opponentIPtextField.getText();
@@ -344,16 +355,17 @@ public class InstanciranjeFrejma {
             frameThatAskedQuestion.setEnabled(true);
             return;
         }
-        this.opponentIp = unetaIpAdresa;
+        final String OPPONENTS_IP = unetaIpAdresa;
 
         try{
             int opponentPortTry = Integer.parseInt(unetProtivnikovPort);
             int mojPortTry = Integer.parseInt(unetMojPort);
 
-            if(opponentPortTry>2000 && opponentPortTry < 6000) this.opponentPort = 5000;
-            if (mojPortTry>2000 && mojPortTry < 6000) this.myPort = 5000;
+            if(opponentPortTry>2000 && opponentPortTry < 6000) opponentPortTry = 5000;
+            if (mojPortTry>2000 && mojPortTry < 6000) mojPortTry = 5000;
 
-            JOptionPane.showMessageDialog(null, "opponent IP = " + this.opponentIp + ", opponent port = " + this.opponentPort + ", my port = " + this.myPort);
+            dataToReturn.init(mojPortTry, opponentPortTry, OPPONENTS_IP);
+            JOptionPane.showMessageDialog(null, "opponent IP = " + OPPONENTS_IP + ", opponent port = " + opponentPortTry + ", my port = " + mojPortTry);
         } catch(NumberFormatException exception){
             JOptionPane.showMessageDialog(null, "Unesite brojeve za vas port i protivnikov port");
             frameThatAskedQuestion.setEnabled(true);
@@ -363,6 +375,17 @@ public class InstanciranjeFrejma {
         askWhichPCAnswered = true;  // OVO OMOGUCAVA NASTAVAK PROGRAMA
     }
 
+    static class IpAddressAndPortData{
+        public Integer myPort;
+        public Integer opponentsPort;
+        public String opponentsIpAddress;
+
+        public void init(int myPort, int opponentsPort, String opponentsIpAddress){
+            this.myPort = myPort;
+            this.opponentsPort = opponentsPort;
+            this.opponentsIpAddress = opponentsIpAddress;
+        }
+    }
 
 }
 

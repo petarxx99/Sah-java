@@ -12,7 +12,7 @@ public class Polje extends JButton {
 
 
     public void setDuzina(MyFrame boardFrame){
-        this.duzinaPolja = boardFrame.instanciranjeFrejma.duzinaPolja;
+        this.duzinaPolja = boardFrame.duzinaPolja;
         this.duzinaTable = 8 * duzinaPolja;
     }
     // -------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ public class Polje extends JButton {
     // set metode
 
     public void setPozicija(MyFrame boardFrame) {
-        if(boardFrame.instanciranjeFrejma.whitesPerspective)
+        if(boardFrame.whitesPerspective)
             this.setBounds(duzinaPolja * (file - 1), duzinaTable - duzinaPolja * rank, duzinaPolja, duzinaPolja);
          else
              this.setBounds(duzinaTable - duzinaPolja * file, duzinaPolja * (rank-1), duzinaPolja, duzinaPolja);

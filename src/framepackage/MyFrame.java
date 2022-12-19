@@ -17,6 +17,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     // karakteristike table
     public int duzinaPolja;
     public int duzinaTable;
+    public boolean whitesPerspective;
 
     //------------------------------------------------------------------------------------------------
     public final static byte BROJ_FIGURA_JEDNE_BOJE = 16;
@@ -27,6 +28,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     public final static byte NO_PROMOTION = -1, PROMOTE_QUEEN = 0, PROMOTE_ROOK = 1, PROMOTE_BISHOP = 2, PROMOTE_KNIGHT = 3;
 
     // promenljive
+    boolean da_li_da_obavestim_da_je_igrac_u_sahu = false;
     public boolean ovoJePoljeDestinacije = false;
     public boolean kliknuoSamNaPoljeSaFigurom = false;
     public byte koJeNaPotezu = ChessConstants.WHITE_TO_MOVE; // 0 = beli je na potezu, 1 = crni je na potezu
@@ -74,7 +76,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
     public Figure[][] figura = new Figure[2][16];
 
-    public InstanciranjeFrejma instanciranjeFrejma;
+//    public InstanciranjeFrejma instanciranjeFrejma;
     private MoveSender moveSender;
 
     public byte startRank, startFile, destinationRank, destinationFile;
@@ -87,11 +89,11 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     // konstruktor
     public MyFrame(){}
 
-    public void init(InstanciranjeFrejma instanciranjeFrejma, MoveSender moveSender) {
-        this.instanciranjeFrejma = instanciranjeFrejma;
+    public void init(boolean whitesPerspective, int duzinaPolja, MoveSender moveSender) {
         this.moveSender = moveSender;
-        this.duzinaPolja = instanciranjeFrejma.duzinaPolja;
+        this.duzinaPolja = duzinaPolja;
         this.duzinaTable = 8 * duzinaPolja;
+        this.whitesPerspective = whitesPerspective;
 
         this.setSize(700, 700);
         this.setLayout(null);
@@ -577,7 +579,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
                 }
                 poljePozadina[rank][file].setOpaque(true);
 
-                if(this.instanciranjeFrejma.whitesPerspective) {
+                if(this.whitesPerspective) {
                     poljePozadina[rank][file].setBounds(duzinaPolja * (file - 1), duzinaTable - duzinaPolja * rank, duzinaPolja, duzinaPolja);
                 }else {
                     poljePozadina[rank][file].setBounds(duzinaTable - file * duzinaPolja, (rank - 1) * duzinaPolja, duzinaPolja, duzinaPolja);
@@ -650,7 +652,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         labelObavestavamOsahu.setBounds(duzinaTable+10, 250, 300,25);
         labelObavestavamOsahu.setVisible(false);
         labelObavestavamOsahu.setText("Niste u sahu.");
-        if(instanciranjeFrejma.da_li_da_obavestim_da_je_igrac_u_sahu){
+        if(da_li_da_obavestim_da_je_igrac_u_sahu){
             labelObavestavamOsahu.setVisible(true);
         }
         layeredPane.add(labelObavestavamOsahu);

@@ -12,17 +12,18 @@ import java.util.*;
 public class MoveSender {
     public static final byte WHITE_COLOR = 0;
     public static final byte BLACK_COLOR = 1;
-    public Opponents opponent;
+    private Opponents opponent;
+    public Opponents getOpponent(){return opponent;}
 
     private ReceiverOfChessMoves receiverOfMoves;
     private MoveEncoder moveEncoder;
     private String opponentIpAddress, myIpAddress;
     private Integer opponentPort, myPort;
-    public byte opponentsColor = BLACK_COLOR;
+    private byte opponentsColor = BLACK_COLOR;
+    public byte getOpponentsColor(){return opponentsColor;}
     private ServerSocket serverSocket;
 
-    PromotionThread promotionThread;
-
+    private PromotionThread promotionThread;
 
 
    /* I chose this design because this way new promotionThread is created for every new promotion move.
@@ -42,11 +43,9 @@ public class MoveSender {
         threadPromotion.start();
     }
 
-
     public void promotionHasOccured(Promotion promotion){
         promotionThread.promotionHasOccured(promotion);
     }
-
 
     public void getAndSendMove(int startRank, int startFile, int endRank, int endFile, Promotion promotion) throws Exception {
         if(promotion == null){
@@ -108,20 +107,8 @@ public class MoveSender {
         activatePort();
     }
 
-    public void setOpponentIpAddress(String opponentIpAddress){
-        this.opponentIpAddress = opponentIpAddress;
-    }
-
-    public void setOpponentPort(int opponentPort){
-        this.opponentPort = opponentPort;
-    }
-
-
-
-
-
     public void receiveMove(){
-        byte[] opponentMove = moveEncoder.createBufferForTheMove();
+        byte[] opponentMoveBuffer = moveEncoder.createBufferForTheMove();
         try {
 
             System.out.println("Waiting for opponent's move.");
@@ -129,14 +116,14 @@ public class MoveSender {
             System.out.println("Player has sent a move.");
 
             BufferedInputStream bis = new BufferedInputStream(socketReceive.getInputStream());
-            bis.read(opponentMove);
+            bis.read(opponentMoveBuffer);
 
             bis.close();
             socketReceive.close();
 
-            Move aMove = moveEncoder.decodeMove(opponentMove);
-            System.out.printf("Received move: %s \n", aMove.toString());
-            receiverOfMoves.receiveOpponentsMove(aMove);
+            Move opponentsMove = moveEncoder.decodeMove(opponentMoveBuffer);
+            System.out.printf("Received move: %s \n", opponentsMove.toString());
+            receiverOfMoves.receiveOpponentsMove(opponentsMove);
 
         } catch(IOException e){
             e.printStackTrace();

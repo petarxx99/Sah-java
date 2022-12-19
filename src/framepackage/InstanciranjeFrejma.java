@@ -82,7 +82,7 @@ public class InstanciranjeFrejma {
                     receiverOfChessMoves);
 
 // Ako igram crnog, onda moram da dobijem prvi potez od igraca sa drugog kompjutera.
-            if(moveSender.opponentsColor == MoveSender.WHITE_COLOR){ //Ako je protivnik beli onda primam prvi potez od njega i to u novom thread-u
+            if(moveSender.getOpponentsColor() == MoveSender.WHITE_COLOR){ //Ako je protivnik beli onda primam prvi potez od njega i to u novom thread-u
                 Thread threadFirstMove = new Thread(moveSender::receiveMove);
                 threadFirstMove.start();
             }

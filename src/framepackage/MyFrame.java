@@ -161,7 +161,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
             boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
             final boolean PROMOTION_HAS_OCCURED = promotionHappened;
             labelObavestenja();
-            if (moveSender.opponent != Opponents.HUMAN_ON_THIS_PC){
+            if (moveSender.getOpponent() != Opponents.HUMAN_ON_THIS_PC){
                 sendAndReceiveMove(moveWasPlayed, PROMOTION_HAS_OCCURED);
             }
         }
@@ -171,7 +171,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     public void obavestiDaJePromocijaGotova(Promotion promotion){
         promotionButtonClicked = true;
         choosingPromotionPiece = false;
-        if(moveSender.opponent != Opponents.HUMAN_ON_THIS_PC) {
+        if(moveSender.getOpponent() != Opponents.HUMAN_ON_THIS_PC) {
             moveSender.promotionHasOccured(promotion);
         }
     }
@@ -368,10 +368,10 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 // Za to se brine sledeca linija koda.
                     boolean output = false;
                     
-                    if((moveSender.opponent != Opponents.HUMAN_ON_THIS_PC)  && (koJeNaPotezu == moveSender.opponentsColor)) {
+                    if((moveSender.getOpponent() != Opponents.HUMAN_ON_THIS_PC)  && (koJeNaPotezu == moveSender.getOpponentsColor())) {
                         System.out.println("Sada je protivnikov potez.");
                         System.out.println("Na potezu je = " + koJeNaPotezu);
-                        System.out.println("Protivnik ima boju = " + moveSender.opponentsColor);
+                        System.out.println("Protivnik ima boju = " + moveSender.getOpponentsColor());
                         output = true;
                     }
 // Ukoliko trenutno biram u sta cu da promovisem pesaka i dalje je moj potez, ali ja ne bih smeo da

@@ -173,9 +173,10 @@ public class MoveSender {
         this.opponent = opponent;
     }
 
-    public MoveSender(Opponents opponent, MoveEncoder moveEncoder){
+    public MoveSender(Opponents opponent, MoveEncoder moveEncoder, byte opponentsColor){
         this.opponent = opponent;
         this.moveEncoder = moveEncoder;
+        this.opponentsColor = opponentsColor;
     }
 
 

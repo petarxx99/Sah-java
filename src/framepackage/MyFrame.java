@@ -1,9 +1,6 @@
 package src.framepackage;
 
-import src.communication.Move;
-import src.communication.MoveSender;
-import src.communication.Promotion;
-import src.communication.ReceiverOfChessMoves;
+import src.communication.*;
 import src.paketfigure.Figure;
 import src.paketpolje.Polje;
 import src.raznefigure.*;
@@ -32,7 +29,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     // promenljive
     public boolean ovoJePoljeDestinacije = false;
     public boolean kliknuoSamNaPoljeSaFigurom = false;
-    public byte koJeNaPotezu = 0; // 0 = beli je na potezu, 1 = crni je na potezu
+    public byte koJeNaPotezu = ChessConstants.WHITE_TO_MOVE; // 0 = beli je na potezu, 1 = crni je na potezu
     public static byte rankKliknuteFigure, fileKliknuteFigure, pozicijaKliknuteFigure, indeksKliknuteFigure;
     public static String beli = "beli", crni = "crni";
     public JButton dugmeZaSah;
@@ -78,19 +75,19 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     public Figure[][] figura = new Figure[2][16];
 
     public InstanciranjeFrejma instanciranjeFrejma;
-    public MoveSender moveSender;
-    public String myOpponentIp;
-    public int  myOpponentPort, thisProgramPort;
-    public Opponents myOpponent;
+    private MoveSender moveSender;
+
     public byte startRank, startFile, destinationRank, destinationFile;
     public boolean moveWasPlayed = false;
     public boolean promotionHappened = false;
     public boolean promotionButtonClicked = false;  // SKLONI DUGMICE PROMOCIJE METODA GA MENJA
     public Promotion promotionButtonNumber = Promotion.NO_PROMOTION;
-    PromotionThread promotionThread;
+
 
     // konstruktor
-    public MyFrame(InstanciranjeFrejma instanciranjeFrejma, MoveSender moveSender) {
+    public MyFrame(){}
+
+    public void init(InstanciranjeFrejma instanciranjeFrejma, MoveSender moveSender) {
         this.instanciranjeFrejma = instanciranjeFrejma;
         this.moveSender = moveSender;
         this.duzinaPolja = instanciranjeFrejma.duzinaPolja;
@@ -116,9 +113,6 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
             }
         }
 
-        // ako hocu da igram protiv drugog kompjutera 
-        initMoveSender(moveSender);
-        
         this.add(layeredPane);
         this.setVisible(true);
 
@@ -170,8 +164,6 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
             }
         }
     }
-
-
 
 
     public void obavestiDaJePromocijaGotova(Promotion promotion){
@@ -627,25 +619,6 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         }
     }
 
- 
-    private void initMoveSender(MoveSender moveSender){
-        myOpponent = instanciranjeFrejma.opponent;
-        myOpponentIp = instanciranjeFrejma.opponentIp;
-        myOpponentPort = instanciranjeFrejma.opponentPort;
-        thisProgramPort = instanciranjeFrejma.myPort;
-
-        if(myOpponent != Opponents.HUMAN_ON_THIS_PC){
-            moveSender.setInfo(myOpponentIp, myOpponentPort, "localhost", thisProgramPort, this);
-            moveSender.activatePort();
-
-// Ako igram crnog, onda moram da dobijem prvi potez od igraca sa drugog kompjutera.
-            if(moveSender.opponentsColor == 0){ //Ako je protivnik beli onda primam prvi potez od njega i to u novom thread-u
-                Thread threadFirstMove = new Thread(moveSender::receiveMove);
-                threadFirstMove.start();
-            }
-        }
-    }
-    
     
     private void addCosmeticsToTheLayeredPane(JLayeredPane layeredPane){
         labelCijiPotez = new JLabel();

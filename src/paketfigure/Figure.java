@@ -1,6 +1,7 @@
 package src.paketfigure;
 
 
+import src.communication.ChessConstants;
 import src.raznefigure.*;
 import src.framepackage.*;
 
@@ -141,18 +142,21 @@ public class Figure extends JLabel {
         return  rank*10 + file;
    }
 
-
-
-   public static byte invert(int koJeNaPotezu){
-       byte izlaz =1;
-       if(koJeNaPotezu==0){
-           izlaz = 1;
-        }
-       if(koJeNaPotezu==1){
-           izlaz = 0;
-       }
-       return izlaz;
+   public boolean amIOnThisSquare(int rank, int file){
+        return rank == this.rank && file == this.file;
    }
+
+    public static byte invert(int koJeNaPotezu){
+        byte izlaz = ChessConstants.BLACK_TO_MOVE;
+
+        if(koJeNaPotezu== ChessConstants.WHITE_TO_MOVE){
+            izlaz = ChessConstants.BLACK_TO_MOVE;
+        }
+        if(koJeNaPotezu== ChessConstants.BLACK_TO_MOVE){
+            izlaz = ChessConstants.WHITE_TO_MOVE;
+        }
+        return izlaz;
+    }
 
 
     // kretanje figura sa jednog mesta na drugo ------------------------------------------------

@@ -18,7 +18,7 @@ public class Mainclass {
     public static void main(String[] args){
 
         int duzinaPolja = 60;
-        InstanciranjeFrejma.instancirajFrejm(duzinaPolja);
+        InstanciranjeFrejma instanciranjeFrejma = new InstanciranjeFrejma(duzinaPolja);
     }
 }
 

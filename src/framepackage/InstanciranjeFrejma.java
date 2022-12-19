@@ -1,6 +1,7 @@
 package src.framepackage;
 
 import src.communication.MoveSender;
+import src.communication.ReceiverOfChessMoves;
 import src.communication.encoding.MoveEncoder;
 import src.communication.encoding.MoveEncoder3bytes;
 
@@ -42,36 +43,53 @@ public class InstanciranjeFrejma implements ActionListener{
     };
 
 
-    public static void instancirajFrejm(int duzinaPolja){
+    public InstanciranjeFrejma(int duzinaPolja){
 
-        InstanciranjeFrejma thisClass = new InstanciranjeFrejma();
-        thisClass.duzinaPolja = duzinaPolja;
+        this.duzinaPolja = duzinaPolja;
 
-        thisClass.askWhiteOrBlackPieces();
+        this.askWhiteOrBlackPieces();
 
-        thisClass.askAgainstWhomYouPlay();
+        this.askAgainstWhomYouPlay();
 
-        switch (thisClass.opponent) {
+        switch (this.opponent) {
             case CHESS_ENGINE: {
-                thisClass.opponentPort = 5003;
+                this.opponentPort = 5003;
                 break;
             }
             case PLAYER_ON_ANOTHER_PC: {
-                thisClass.askWhichPC();
-                if (thisClass.whichPC == CUSTOM_IP_AND_PORT){
-                    thisClass.askForOpponentIP();
+                this.askWhichPC();
+                if (this.whichPC == CUSTOM_IP_AND_PORT){
+                    this.askForOpponentIP();
                 }
                 break;
             }
         }
 
         MoveEncoder moveEncoder = new MoveEncoder3bytes();
-        MoveSender moveSender = new MoveSender(thisClass.opponent, moveEncoder);
-        moveSender.opponentsColor = thisClass.opponentsColor;
+        MoveSender moveSender = new MoveSender(this.opponent, moveEncoder);
+        moveSender.opponentsColor = this.opponentsColor;
 
-        MyFrame frejm1 = new MyFrame(thisClass, moveSender);
+        MyFrame frejm1 = new MyFrame();
+        initMoveSender(moveSender, frejm1);
+        frejm1.init(this, moveSender);
     }
 
+    private void initMoveSender(MoveSender moveSender, ReceiverOfChessMoves receiverOfChessMoves){
+        if(this.opponent != Opponents.HUMAN_ON_THIS_PC){
+            moveSender.init(
+                    this.opponentIp,
+                    this.opponentPort,
+                    "localhost",
+                    this.myPort,
+                    receiverOfChessMoves);
+
+// Ako igram crnog, onda moram da dobijem prvi potez od igraca sa drugog kompjutera.
+            if(moveSender.opponentsColor == MoveSender.WHITE_COLOR){ //Ako je protivnik beli onda primam prvi potez od njega i to u novom thread-u
+                Thread threadFirstMove = new Thread(moveSender::receiveMove);
+                threadFirstMove.start();
+            }
+        }
+    }
 
     public void askWhiteOrBlackPieces(){
 

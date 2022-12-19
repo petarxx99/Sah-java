@@ -10,13 +10,16 @@ import java.io.*;
 import java.util.*;
 
 public class MoveSender {
-    public ReceiverOfChessMoves receiverOfMoves;
+    public static final byte WHITE_COLOR = 0;
+    public static final byte BLACK_COLOR = 1;
     public Opponents opponent;
+
+    private ReceiverOfChessMoves receiverOfMoves;
     private MoveEncoder moveEncoder;
-    public String opponentIpAddress, myIpAddress;
-    public int opponentPort, myPort;
-    public byte opponentsColor = 1;
-    public ServerSocket serverSocket;
+    private String opponentIpAddress, myIpAddress;
+    private Integer opponentPort, myPort;
+    public byte opponentsColor = BLACK_COLOR;
+    private ServerSocket serverSocket;
 
     PromotionThread promotionThread;
 
@@ -76,20 +79,33 @@ public class MoveSender {
 
     }
 
-    public void activatePort(){
+    private void activatePort(){
         try{
-            this.serverSocket = new ServerSocket(myPort);
+            if(this.serverSocket == null) {
+                this.serverSocket = new ServerSocket(myPort);
+            }
         } catch(IOException e){
             e.printStackTrace();
         }
     }
 
-    public void setInfo(String opponentIpAddress, int opponentPort, String myIpAddress, int myPort, ReceiverOfChessMoves receiverOfMoves){
-        this.opponentIpAddress = opponentIpAddress;
-        this.opponentPort = opponentPort;
-        this.myIpAddress = myIpAddress;
-        this.myPort = myPort;
-        this.receiverOfMoves = receiverOfMoves;
+    public void init(String opponentIpAddress, int opponentPort, String myIpAddress, int myPort, ReceiverOfChessMoves receiverOfMoves){
+        if(this.opponentIpAddress == null) {
+            this.opponentIpAddress = opponentIpAddress;
+        }
+        if(this.opponentPort == null) {
+            this.opponentPort = opponentPort;
+        }
+        if(this.myIpAddress == null) {
+            this.myIpAddress = myIpAddress;
+        }
+        if(this.myPort == null) {
+            this.myPort = myPort;
+        }
+        if(this.receiverOfMoves == null) {
+            this.receiverOfMoves = receiverOfMoves;
+        }
+        activatePort();
     }
 
     public void setOpponentIpAddress(String opponentIpAddress){

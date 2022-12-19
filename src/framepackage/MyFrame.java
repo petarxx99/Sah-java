@@ -141,7 +141,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
             /* Proveravam da li je igrac kliknuo na figuru, ako jeste, pamtim na koju je kliknuo. */
             for (int i = 0; i<BROJ_FIGURA_JEDNE_BOJE; i++) {
-                if (figura[koJeNaPotezu][i].getPozicija() == clickedSquare.getPozicija()) {
+                if (figura[koJeNaPotezu][i].amIOnThisSquare(rank, file)) {
                     ovoJePoljeDestinacije = true;
                     indeksKliknuteFigure = (byte) i;
                     startRank = (byte) rank;

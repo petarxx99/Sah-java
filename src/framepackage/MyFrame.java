@@ -124,55 +124,54 @@ public class MyFrame extends JFrame implements ActionListener {
     }
     // ovde prestaje konstruktor
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-// prolazim kroz sva polja (dugmice) da vidim koje je pritisnuto
-        for (int rank = 1; rank < 9; rank++) {
-            for (int file = 1; file < 9; file++) {
-                if (actionEvent.getSource() == polje[rank][file]) {
-                    Polje kliknutoPolje = polje[rank][file];
+    /*
+    This is a callback method. This method is called when a chess square is clicked.
+     */
+    public void chessSquareWasClicked(byte rank, byte file){
+        Polje clickedSquare = polje[rank][file];
 
-                     if (shouldIbreakTheLoop()) {
-                         break;
-                     }
-                                         
+        if (shouldIbreakTheLoop()) {
+            return;
+        }
+
   /* Da bih pomerio figuru moram da kliknem na 2 dugmeta, 1. dugme je dugme sa figurom,
  2. dugme je dugme destinacije, tj. dugme/polje gde zelim da ta figura ode.
  Sada cu napisati kod za 2 slucaja, PRVI SLUCAJ: kliknuo sam na polje na kojoj se nalazi figura koju zelim da pomerim.
  DRUGI SLUCAJ: kliknuo sam na polje gde zelim da figura ode. */
 // Sada obradjujem slucaj da smo kliknuli na polje s kojeg zelimo da pomerimo figuru (1. SLUCAJ).
 
-                    if (!ovoJePoljeDestinacije) {
-                        resetBoardPromenljive();                         
-                        showWhoseTurnItIs();
-                        
- /* Proveravam da li je igrac kliknuo na figuru, ako jeste, pamtim na koju je kliknuo. */
-                        for (int i = 0; i<BROJ_FIGURA_JEDNE_BOJE; i++) {
-                            if (figura[koJeNaPotezu][i].getPozicija() == kliknutoPolje.getPozicija()) {
-                                ovoJePoljeDestinacije = true;
-                                indeksKliknuteFigure = (byte) i;
-                                startRank = (byte) rank;
-                                startFile = (byte) file;
-                                break;
-                            }
-                        }
-                    }
-/* Sada obradjujem slucaj da smo kliknuli na polje na koje zelimo da pomerimo figuru (2. SLUCAJ). */
-                   else if (ovoJePoljeDestinacije) {
-                          if (jedemSopstvenuFiguru(rank, file, koJeNaPotezu)){
-                              indeksKliknuteFigure = indeksIgraceveFigureNaPolju(rank, file, koJeNaPotezu);
-                              break;
-                          }
-                          boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
-                          final boolean PROMOTION_HAS_OCCURED = promotionHappened;
-                          labelObavestenja();
-                          if (moveSender.opponent != Opponents.HUMAN_ON_THIS_PC){
-                                sendAndReceiveMove(moveWasPlayed, PROMOTION_HAS_OCCURED);
-                          }
-                   }
+        if (!ovoJePoljeDestinacije) {
+            resetBoardPromenljive();
+            showWhoseTurnItIs();
+
+            /* Proveravam da li je igrac kliknuo na figuru, ako jeste, pamtim na koju je kliknuo. */
+            for (int i = 0; i<BROJ_FIGURA_JEDNE_BOJE; i++) {
+                if (figura[koJeNaPotezu][i].getPozicija() == clickedSquare.getPozicija()) {
+                    ovoJePoljeDestinacije = true;
+                    indeksKliknuteFigure = (byte) i;
+                    startRank = (byte) rank;
+                    startFile = (byte) file;
+                    break;
                 }
             }
         }
+        /* Sada obradjujem slucaj da smo kliknuli na polje na koje zelimo da pomerimo figuru (2. SLUCAJ). */
+        else  {
+            if (jedemSopstvenuFiguru(rank, file, koJeNaPotezu)){
+                indeksKliknuteFigure = indeksIgraceveFigureNaPolju(rank, file, koJeNaPotezu);
+                return;
+            }
+            boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
+            final boolean PROMOTION_HAS_OCCURED = promotionHappened;
+            labelObavestenja();
+            if (moveSender.opponent != Opponents.HUMAN_ON_THIS_PC){
+                sendAndReceiveMove(moveWasPlayed, PROMOTION_HAS_OCCURED);
+            }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
 
         // ovde zadajem komande sta se desava ako igraci kliknu na dugme za sah
         // dugme moze da bude on ili off. Ako je dugme on, igraci ce se obavestavati o tome da li su u sahu.
@@ -632,7 +631,10 @@ public class MyFrame extends JFrame implements ActionListener {
                 //polje[rank][file].setBounds(duzinaPolja * (file - 1), duzinaTable - duzinaPolja * rank, duzinaPolja, duzinaPolja);
                 polje[rank][file].setRankFile(rank, file);
                 polje[rank][file].setPozicija(this);
-                polje[rank][file].addActionListener(this); // BITAN KORAK! OVIM KORAKOM GOVORIM KOMPJUTERU DA NESTO TREBA DA SE DESI KAD KLIKNEM NA POLJE
+
+                final byte RANK = (byte) rank;
+                final byte FILE = (byte) file;
+                polje[rank][file].addActionListener(actionEvent-> chessSquareWasClicked(RANK, FILE)); // BITAN KORAK! OVIM KORAKOM GOVORIM KOMPJUTERU DA NESTO TREBA DA SE DESI KAD KLIKNEM NA POLJE
                 layeredPane.add(polje[rank][file], Integer.valueOf(2));
             }
         }

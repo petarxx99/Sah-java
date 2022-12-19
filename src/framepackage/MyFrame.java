@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class MyFrame extends JFrame implements ActionListener {
+public class MyFrame extends JFrame  {
 
     // karakteristike table
     public int duzinaPolja;
@@ -170,44 +170,8 @@ public class MyFrame extends JFrame implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-
-        // ovde zadajem komande sta se desava ako igraci kliknu na dugme za sah
-        // dugme moze da bude on ili off. Ako je dugme on, igraci ce se obavestavati o tome da li su u sahu.
-        if(actionEvent.getSource() == dugmeZaSah){
-            if(dugmeZaSahJeOn){
-                labelObavestavamOsahu.setVisible(false);
-                dugmeZaSahJeOn = false;
-            } else {
-                labelObavestavamOsahu.setVisible(true);
-                dugmeZaSahJeOn = true;
-            }
-        }
 
 
-        // SLEDI KOD ZA PROMOCIJU PESAKA -----------------------------------------------------------
-        
-        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_QUEEN]){
-            promoteQueen();
-        }
-
-        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_ROOK]){
-            promoteRook();
-        }
-        
-        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_BISHOP]){
-            promoteBishop();
-        }
-        
-        if(actionEvent.getSource() == dugmiciPromocije[PROMOTE_KNIGHT]){
-            promoteKnight();
-        }
-
-    }
-
-    // ACTION PERFORMED KONTROLISANJE DUGMICA SE ZAVRSAVA OVDE ---------------------------------------------
-    // ------------------------------------------------------------------------------------------------------
 
     public void obavestiDaJePromocijaGotova(Promotion promotion){
         promotionButtonClicked = true;
@@ -642,13 +606,19 @@ public class MyFrame extends JFrame implements ActionListener {
     
     private void addPromButtonsToTheLayeredPane(JLayeredPane layeredPane){
         dugmiciPromocije[0].setText("kraljica");
+        dugmiciPromocije[0].addActionListener(actionEvent -> promoteQueen());
+
         dugmiciPromocije[1].setText("top");
+        dugmiciPromocije[1].addActionListener(actionEvent -> promoteRook());
+
         dugmiciPromocije[2].setText("lovac");
+        dugmiciPromocije[2].addActionListener(actionEvent -> promoteBishop());
+
         dugmiciPromocije[3].setText("konj");
+        dugmiciPromocije[3].addActionListener(actionEvent -> promoteKnight());
 
         for(int i=0; i<4; i++){
             dugmiciPromocije[i].setBounds(2*i*duzinaPolja, duzinaPolja*3, 2*duzinaPolja,duzinaPolja);
-            dugmiciPromocije[i].addActionListener(this);
             dugmiciPromocije[i].setVisible(false);
             layeredPane.add(dugmiciPromocije[i], Integer.valueOf(3));
         }
@@ -712,10 +682,21 @@ public class MyFrame extends JFrame implements ActionListener {
         // ovo dugme omogucava igracima da kontrolisu da li ce im se prikazivati da li su u sahu ili ne
         dugmeZaSah = new JButton("Kliknite da se prikaze kada ste u sahu");
         dugmeZaSah.setBounds(duzinaPolja, duzinaTable + 20, 400, 25);
-        dugmeZaSah.addActionListener(this); // JAKO BITAN KORAK! BEZ OVOG KORAKA DUGME NECE RADITI NISTA
+        dugmeZaSah.addActionListener(actionEvent -> dugmeZaSahWasClicked()); // JAKO BITAN KORAK! BEZ OVOG KORAKA DUGME NECE RADITI NISTA
         dugmeZaSah.setVisible(true);
         layeredPane.add(dugmeZaSah);
 
+    }
+    // ovde zadajem komande sta se desava ako igraci kliknu na dugme za sah
+    // dugme moze da bude on ili off. Ako je dugme on, igraci ce se obavestavati o tome da li su u sahu.
+    public void dugmeZaSahWasClicked(){
+        if(dugmeZaSahJeOn){
+            labelObavestavamOsahu.setVisible(false);
+            dugmeZaSahJeOn = false;
+        } else {
+            labelObavestavamOsahu.setVisible(true);
+            dugmeZaSahJeOn = true;
+        }
     }
     
     public boolean nalaziSeFigura(int rank, int file) {

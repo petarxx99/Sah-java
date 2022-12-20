@@ -1,5 +1,6 @@
 package src.framepackage;
 
+import src.communication.movesender.MoveSenderWithPortAndIP;
 import src.constants.ChessConstants;
 import src.communication.movesender.MoveSender;
 import src.communication.encoding.MoveEncoder;
@@ -61,7 +62,7 @@ public class InstanciranjeFrejma {
         }
 
         MoveEncoder moveEncoder = new MoveEncoder3bytes();
-        MoveSender moveSender = new MoveSender(opponent, moveEncoder, opponentsColor, opponentIpAddress, opponentPort, "localhost", myPort);
+        MoveSender moveSender = new MoveSenderWithPortAndIP(opponent, moveEncoder, opponentsColor, opponentIpAddress, opponentPort, "localhost", myPort);
         
         MyFrame chessGame = new MyFrame(opponent, whitesPerspective, opponentsColor, duzinaPolja, moveSender);
         chessGame.startGame();

@@ -91,7 +91,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
 
     // konstruktor
-    public MyFrame(Opponents opponent, boolean whitesPerspective, byte opponentsColor, int duzinaPolja, MoveSender moveSender){
+    public MyFrame(MoveSender moveSender, Opponents opponent, boolean whitesPerspective, byte opponentsColor, int duzinaPolja){
         this.opponentsColor = opponentsColor;
         this.moveSender = moveSender;
         this.duzinaPolja = duzinaPolja;

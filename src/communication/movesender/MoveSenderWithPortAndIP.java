@@ -54,27 +54,10 @@ public class MoveSenderWithPortAndIP implements MoveSender{
         Move moveToSend = new Move(startRank, startFile, endRank, endFile, promotion);
         byte[] encodedMoveToSend = moveEncoder.encodeMove(moveToSend);
 
-        switch (opponent){
-            case PLAYER_ON_ANOTHER_PC: {
-                sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
-                receiverOfMoves.moveIsSentToOpponent(moveToSend);
-                System.out.printf("The move that was sent: %s \n", moveToSend.toString());
-                receiveMove(receiverOfMoves);
-                break;
-            }
-            case CHESS_ENGINE: {
-                System.out.println("Ovo cu napraviti u buducnosti");
-                break;
-            }
-            case HUMAN_ON_THIS_PC: {
-
-                break;
-            }
-            default: {
-
-            }
-        }
-
+        sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
+        receiverOfMoves.moveIsSentToOpponent(moveToSend);
+        System.out.printf("The move that was sent: %s \n", moveToSend.toString());
+        receiveMove(receiverOfMoves);
     }
 
     private void activatePort(){
@@ -124,7 +107,6 @@ public class MoveSenderWithPortAndIP implements MoveSender{
             bos.write(move);
             bos.close();
            // socketSend.close();
-            System.out.println("The move is sent.");
 
         } catch(IOException e){
             e.printStackTrace();

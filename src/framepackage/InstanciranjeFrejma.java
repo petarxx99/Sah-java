@@ -1,5 +1,7 @@
 package src.framepackage;
 
+import src.communication.movesender.MoveSenderMock;
+import src.communication.movesender.MoveSenderToEngine;
 import src.communication.movesender.MoveSenderWithPortAndIP;
 import src.constants.ChessConstants;
 import src.communication.movesender.MoveSender;
@@ -38,33 +40,28 @@ public class InstanciranjeFrejma {
         boolean whitesPerspective = opponentsColor == ChessConstants.BLACK;
 
         Opponents opponent = askAgainstWhomYouPlay();
-        int opponentPort = 5000, myPort = 5000;
-        String opponentIpAddress = "localhost";
+        MoveSender moveSender = null;
 
         switch(opponent){
             case CHESS_ENGINE:{
-                opponentPort = 6000;
-                myPort = 5000;
-                opponentIpAddress = "localhost";
+                moveSender = new MoveSenderToEngine();
                 break;
             }
             case PLAYER_ON_ANOTHER_PC:{
                 WhichPcEnum whichPc = askWhichPC();
                 if(whichPc == WhichPcEnum.CUSTOM_IP_AND_PORT){
                     IpAddressAndPortData ipPort = askForOpponentIPandPort();
-                    opponentIpAddress = ipPort.opponentsIpAddress;
-                    myPort = ipPort.myPort;
-                    opponentPort = ipPort.opponentsPort;
+                    MoveEncoder moveEncoder = new MoveEncoder3bytes();
+                    moveSender = new MoveSenderWithPortAndIP(opponent, moveEncoder, opponentsColor, ipPort.opponentsIpAddress, ipPort.opponentsPort, "localhost", ipPort.myPort);
                 }
                 break;
             }
-            default:{}
+            default:{
+                moveSender = new MoveSenderMock();
+            }
         }
 
-        MoveEncoder moveEncoder = new MoveEncoder3bytes();
-        MoveSender moveSender = new MoveSenderWithPortAndIP(opponent, moveEncoder, opponentsColor, opponentIpAddress, opponentPort, "localhost", myPort);
-        
-        MyFrame chessGame = new MyFrame(opponent, whitesPerspective, opponentsColor, duzinaPolja, moveSender);
+        MyFrame chessGame = new MyFrame(moveSender, opponent, whitesPerspective, opponentsColor, duzinaPolja);
         chessGame.startGame();
     }
 

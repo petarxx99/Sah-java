@@ -1,6 +1,8 @@
 package src.framepackage;
 
 import src.communication.*;
+import src.communication.movesender.MoveSender;
+import src.constants.ChessConstants;
 import src.paketfigure.Figure;
 import src.paketpolje.Polje;
 import src.raznefigure.*;
@@ -8,8 +10,6 @@ import src.raznefigure.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class MyFrame extends JFrame implements ReceiverOfChessMoves {
@@ -84,16 +84,20 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     public boolean promotionHappened = false;
     public boolean promotionButtonClicked = false;  // SKLONI DUGMICE PROMOCIJE METODA GA MENJA
     public Promotion promotionButtonNumber = Promotion.NO_PROMOTION;
+    public final Opponents opponent;
+    private byte opponentsColor = ChessConstants.BLACK_TO_MOVE;
 
 
     // konstruktor
-    public MyFrame(){}
-
-    public void init(boolean whitesPerspective, int duzinaPolja, MoveSender moveSender) {
+    public MyFrame(Opponents opponent, boolean whitesPerspective, byte opponentsColor, int duzinaPolja, MoveSender moveSender){
+        this.opponentsColor = opponentsColor;
         this.moveSender = moveSender;
+        moveSender.init();
+
         this.duzinaPolja = duzinaPolja;
         this.duzinaTable = 8 * duzinaPolja;
         this.whitesPerspective = whitesPerspective;
+        this.opponent = opponent;
 
         this.setSize(700, 700);
         this.setLayout(null);
@@ -107,7 +111,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         addCosmeticsToTheLayeredPane(layeredPane);
         addPromButtonsToTheLayeredPane(layeredPane);
         addBoardBackgroundAndButtonsToTheLayeredPane(layeredPane);
-        
+
         initFigure();
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 16; j++) {
@@ -116,17 +120,27 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         }
 
         this.add(layeredPane);
-        this.setVisible(true);
-
     }
+
+    public void startGame(){
+        waitForFirstMoveIfIamBlackAndIfIPlayAgainstAwayOpponent(opponent, opponentsColor, moveSender);
+        this.setVisible(true);
+    }
+
+
+    private void waitForFirstMoveIfIamBlackAndIfIPlayAgainstAwayOpponent(Opponents opponent, byte opponentsColor, MoveSender moveSender){
+        if(opponent != Opponents.HUMAN_ON_THIS_PC && opponentsColor == ChessConstants.WHITE){
+                Thread waitForFirstMoveThread = new Thread(() -> moveSender.receiveMove(this));
+                waitForFirstMoveThread.start();
+        }
+    }
+
     // ovde prestaje konstruktor
 
     /*
     This is a callback method. This method is called when a chess square is clicked.
      */
     public void chessSquareWasClicked(byte rank, byte file){
-        Polje clickedSquare = polje[rank][file];
-
         if (shouldIbreakTheLoop()) {
             return;
         }
@@ -161,7 +175,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
             boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
             final boolean PROMOTION_HAS_OCCURED = promotionHappened;
             labelObavestenja();
-            if (moveSender.getOpponent() != Opponents.HUMAN_ON_THIS_PC){
+            if (opponent != Opponents.HUMAN_ON_THIS_PC){
                 sendAndReceiveMove(moveWasPlayed, PROMOTION_HAS_OCCURED);
             }
         }
@@ -171,7 +185,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     public void obavestiDaJePromocijaGotova(Promotion promotion){
         promotionButtonClicked = true;
         choosingPromotionPiece = false;
-        if(moveSender.getOpponent() != Opponents.HUMAN_ON_THIS_PC) {
+        if(opponent != Opponents.HUMAN_ON_THIS_PC) {
             moveSender.promotionHasOccured(promotion);
         }
     }
@@ -339,7 +353,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
     private void sendAndReceiveMove(boolean moveWasPlayed, boolean promotionHasOccured){
          if(promotionHasOccured){
-                 moveSender.waitForPromotionAndThenSendMove(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber);
+                 moveSender.waitForPromotionAndThenSendMove(this, startRank, startFile, destinationRank, destinationFile, promotionButtonNumber);
          } else if (moveWasPlayed) {
                  Thread threadGetAndSendMove = new Thread(() -> sendAndReceiveMoveWithoutWaitingForPromotion(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber));
                  threadGetAndSendMove.start();
@@ -350,7 +364,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     
     private void sendAndReceiveMoveWithoutWaitingForPromotion(final byte START_RANK, final byte START_FILE, final byte END_RANK, final byte END_FILE, Promotion promotion){
         try{
-            moveSender.getAndSendMove(START_RANK, START_FILE, END_RANK, END_FILE, promotion);
+            moveSender.getAndSendMove(this, START_RANK, START_FILE, END_RANK, END_FILE, promotion);
         }catch(Exception e){
             e.getMessage();
             e.printStackTrace();
@@ -368,10 +382,10 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 // Za to se brine sledeca linija koda.
                     boolean output = false;
                     
-                    if((moveSender.getOpponent() != Opponents.HUMAN_ON_THIS_PC)  && (koJeNaPotezu == moveSender.getOpponentsColor())) {
+                    if((opponent != Opponents.HUMAN_ON_THIS_PC)  && (koJeNaPotezu == opponentsColor)) {
                         System.out.println("Sada je protivnikov potez.");
                         System.out.println("Na potezu je = " + koJeNaPotezu);
-                        System.out.println("Protivnik ima boju = " + moveSender.getOpponentsColor());
+                        System.out.println("Protivnik ima boju = " + opponentsColor);
                         output = true;
                     }
 // Ukoliko trenutno biram u sta cu da promovisem pesaka i dalje je moj potez, ali ja ne bih smeo da

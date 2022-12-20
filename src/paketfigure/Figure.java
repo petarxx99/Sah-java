@@ -1,14 +1,10 @@
 package src.paketfigure;
 
 
-import src.communication.ChessConstants;
-import src.raznefigure.*;
+import src.constants.ChessConstants;
 import src.framepackage.*;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.event.*;
 import java.util.*;
 
 

@@ -1,26 +1,21 @@
-package src.communication;
+package src.communication.movesender;
 
+import src.communication.Move;
+import src.communication.Promotion;
+import src.communication.ReceiverOfChessMoves;
 import src.communication.encoding.MoveEncoder;
-import src.paketfigure.*;
-import src.framepackage.InstanciranjeFrejma.*;
-import src.framepackage.MyFrame.*;
 import src.framepackage.*;
 import java.net.*;
 import java.io.*;
-import java.util.*;
 
 public class MoveSender {
     public static final byte WHITE_COLOR = 0;
     public static final byte BLACK_COLOR = 1;
     private Opponents opponent;
-    public Opponents getOpponent(){return opponent;}
-
-    private ReceiverOfChessMoves receiverOfMoves;
     private MoveEncoder moveEncoder;
     private String opponentIpAddress, myIpAddress;
     private Integer opponentPort, myPort;
     private byte opponentsColor = BLACK_COLOR;
-    public byte getOpponentsColor(){return opponentsColor;}
     private ServerSocket serverSocket;
 
     private PromotionThread promotionThread;
@@ -33,12 +28,12 @@ public class MoveSender {
    *  I think the solution that I chose is less messy, there is no reseting variables
    * other than writting promotionThread = new PromotionThread
    * PromotionThread also holds info about the promotion move, such as start rank, end rank etc.*/
-    public void waitForPromotionAndThenSendMove(int startRank, int startFile, int destinationRank, int destinationFile, Promotion promotion){
+    public void waitForPromotionAndThenSendMove(ReceiverOfChessMoves receiverOfMoves, int startRank, int startFile, int destinationRank, int destinationFile, Promotion promotion){
         if(promotionThread != null) {
             promotionThread.stopThread();
         }
 
-        promotionThread = new PromotionThread(startRank, startFile, destinationRank, destinationFile, promotion, this);
+        promotionThread = new PromotionThread(receiverOfMoves, startRank, startFile, destinationRank, destinationFile, promotion, this);
         Thread threadPromotion = new Thread(promotionThread);
         threadPromotion.start();
     }
@@ -47,7 +42,7 @@ public class MoveSender {
         promotionThread.promotionHasOccured(promotion);
     }
 
-    public void getAndSendMove(int startRank, int startFile, int endRank, int endFile, Promotion promotion) throws Exception {
+    public void getAndSendMove(ReceiverOfChessMoves receiverOfMoves, int startRank, int startFile, int endRank, int endFile, Promotion promotion) throws Exception {
         if(promotion == null){
             throw new Exception("Promotion is null.");
         }
@@ -60,7 +55,7 @@ public class MoveSender {
                 sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
                 receiverOfMoves.moveIsSentToOpponent(moveToSend);
                 System.out.printf("The move that was sent: %s \n", moveToSend.toString());
-                receiveMove();
+                receiveMove(receiverOfMoves);
                 break;
             }
             case CHESS_ENGINE: {
@@ -88,26 +83,11 @@ public class MoveSender {
         }
     }
 
-    public void init(String opponentIpAddress, int opponentPort, String myIpAddress, int myPort, ReceiverOfChessMoves receiverOfMoves){
-        if(this.opponentIpAddress == null) {
-            this.opponentIpAddress = opponentIpAddress;
-        }
-        if(this.opponentPort == null) {
-            this.opponentPort = opponentPort;
-        }
-        if(this.myIpAddress == null) {
-            this.myIpAddress = myIpAddress;
-        }
-        if(this.myPort == null) {
-            this.myPort = myPort;
-        }
-        if(this.receiverOfMoves == null) {
-            this.receiverOfMoves = receiverOfMoves;
-        }
+    public void init(){
         activatePort();
     }
 
-    public void receiveMove(){
+    public void receiveMove(ReceiverOfChessMoves receiverOfMoves){
         byte[] opponentMoveBuffer = moveEncoder.createBufferForTheMove();
         try {
 
@@ -160,10 +140,14 @@ public class MoveSender {
         this.opponent = opponent;
     }
 
-    public MoveSender(Opponents opponent, MoveEncoder moveEncoder, byte opponentsColor){
+    public MoveSender(Opponents opponent, MoveEncoder moveEncoder, byte opponentsColor,String opponentIpAddress, int opponentPort, String myIpAddress, int myPort){
         this.opponent = opponent;
         this.moveEncoder = moveEncoder;
         this.opponentsColor = opponentsColor;
+        this.opponentIpAddress = opponentIpAddress;
+        this.myPort = myPort;
+        this.opponentPort = opponentPort;
+        this.myIpAddress = myIpAddress;
     }
 
 

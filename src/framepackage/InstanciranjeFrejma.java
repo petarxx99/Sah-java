@@ -1,15 +1,13 @@
 package src.framepackage;
 
-import src.communication.ChessConstants;
-import src.communication.MoveSender;
-import src.communication.ReceiverOfChessMoves;
+import src.constants.ChessConstants;
+import src.communication.movesender.MoveSender;
 import src.communication.encoding.MoveEncoder;
 import src.communication.encoding.MoveEncoder3bytes;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.*;
 
 
@@ -35,9 +33,8 @@ public class InstanciranjeFrejma {
 
 
     public InstanciranjeFrejma(int duzinaPolja){
-
         Byte opponentsColor = askWhiteOrBlackPieces();
-        boolean whitesPerspective = opponentsColor == ChessConstants.BLACK_TO_MOVE;
+        boolean whitesPerspective = opponentsColor == ChessConstants.BLACK;
 
         Opponents opponent = askAgainstWhomYouPlay();
         int opponentPort = 5000, myPort = 5000;
@@ -53,7 +50,7 @@ public class InstanciranjeFrejma {
             case PLAYER_ON_ANOTHER_PC:{
                 WhichPcEnum whichPc = askWhichPC();
                 if(whichPc == WhichPcEnum.CUSTOM_IP_AND_PORT){
-                    IpAddressAndPortData ipPort = askForOpponentIP();
+                    IpAddressAndPortData ipPort = askForOpponentIPandPort();
                     opponentIpAddress = ipPort.opponentsIpAddress;
                     myPort = ipPort.myPort;
                     opponentPort = ipPort.opponentsPort;
@@ -64,30 +61,13 @@ public class InstanciranjeFrejma {
         }
 
         MoveEncoder moveEncoder = new MoveEncoder3bytes();
-        MoveSender moveSender = new MoveSender(opponent, moveEncoder, opponentsColor);
-
-        MyFrame frejm1 = new MyFrame();
-        initMoveSender(moveSender, frejm1, opponentIpAddress, opponentPort, myPort, opponent);
-        frejm1.init(whitesPerspective, duzinaPolja, moveSender);
+        MoveSender moveSender = new MoveSender(opponent, moveEncoder, opponentsColor, opponentIpAddress, opponentPort, "localhost", myPort);
+        
+        MyFrame chessGame = new MyFrame(opponent, whitesPerspective, opponentsColor, duzinaPolja, moveSender);
+        chessGame.startGame();
     }
 
-    private void initMoveSender(MoveSender moveSender, ReceiverOfChessMoves receiverOfChessMoves,
-                                String opponentIp, int opponentPort, int myPort, Opponents opponent){
-        if(opponent != Opponents.HUMAN_ON_THIS_PC){
-            moveSender.init(
-                    opponentIp,
-                    opponentPort,
-                    "localhost",
-                    myPort,
-                    receiverOfChessMoves);
-
-// Ako igram crnog, onda moram da dobijem prvi potez od igraca sa drugog kompjutera.
-            if(moveSender.getOpponentsColor() == MoveSender.WHITE_COLOR){ //Ako je protivnik beli onda primam prvi potez od njega i to u novom thread-u
-                Thread threadFirstMove = new Thread(moveSender::receiveMove);
-                threadFirstMove.start();
-            }
-        }
-    }
+   
 
     public Byte askWhiteOrBlackPieces(){
 
@@ -272,7 +252,7 @@ public class InstanciranjeFrejma {
     }
 
 
-    private IpAddressAndPortData askForOpponentIP(){
+    private IpAddressAndPortData askForOpponentIPandPort(){
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(700, 400);

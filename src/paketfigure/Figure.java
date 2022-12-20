@@ -45,7 +45,7 @@ public class Figure extends JLabel {
     }
 
     public Figure(MyFrame boardFrame, ArrayList<Integer> istorijaPolozaja) {
-        this.duzinaPolja = boardFrame.duzinaPolja;
+        this.duzinaPolja = boardFrame.getSquareLength();
         initDimenzije();
         this.istorijaPolozaja = istorijaPolozaja;
         bioSamPijunKogFajla = istorijaPolozaja.get(0) % 10;
@@ -58,7 +58,7 @@ public class Figure extends JLabel {
         } else {
             this.bojaFigure = 0;
         }
-        this.duzinaPolja = boardFrame.duzinaPolja;
+        this.duzinaPolja = boardFrame.getSquareLength();
         initDimenzije();
         this.setOpaque(true);
         this.setVisible(true);
@@ -87,9 +87,12 @@ public class Figure extends JLabel {
         }
     }
 
-    public void setPozicija(MyFrame boardFrame) {
+    public void setPozicija(boolean whitesPerspective, int chessSquareLength) {
         //this.setBounds(getXkoordinata(), getYkoordinata(), duzinaFigure, duzinaFigure);
-        if(boardFrame.whitesPerspective)
+        this.duzinaPolja = chessSquareLength;
+        initDimenzije();
+
+        if(whitesPerspective)
             this.setBounds(duzinaPolja * (file -1) + odIvice, duzinaTable - rank * duzinaPolja + odIvice, duzinaFigure, duzinaFigure);
         else
             this.setBounds(duzinaTable - duzinaPolja * file + odIvice, duzinaPolja * (rank-1) + odIvice, duzinaFigure, duzinaFigure);
@@ -98,7 +101,7 @@ public class Figure extends JLabel {
     public void setPozicija(int file, int rank, MyFrame boardFrame) {
         this.setFile(file);
         this.setRank(rank);
-        this.setPozicija(boardFrame);
+        this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
         //this.setBounds(getXkoordinata(), getYkoordinata(), duzinaFigure, duzinaFigure);
     }
 

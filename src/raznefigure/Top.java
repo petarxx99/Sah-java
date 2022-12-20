@@ -22,7 +22,7 @@ public class Top extends Figure {
         super(upisi0zaBelog1zaCrnog, boardFrame);
         rank = (upisi0zaBelog1zaCrnog == 0) ? (byte) 1 : (byte) 8;
         file = (ovoJeLeviTop) ? (byte) 1 : (byte) 8;
-        this.setPozicija(boardFrame);
+        this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
     }
 
     @Override
@@ -83,7 +83,7 @@ public class Top extends Figure {
                }
                this.setRank(rank);
                this.setFile(file);
-               this.setPozicija(boardFrame);
+               this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
                nijeSePomerao = false;
                output = true;
            }

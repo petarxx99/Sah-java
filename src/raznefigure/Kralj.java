@@ -18,7 +18,7 @@ public class Kralj extends Figure {
     }
 
     public Kralj(MyFrame boardFrame) {
-        this.duzinaPolja = boardFrame.duzinaPolja;
+        this.duzinaPolja = boardFrame.getSquareLength();
         initDimenzije();
     }
 
@@ -26,7 +26,7 @@ public class Kralj extends Figure {
         super(upisi0zaBelog1zaCrnog, boardFrame);
         rank = (upisi0zaBelog1zaCrnog == 0) ? (byte) 1 : (byte) 8;
         file = 5;
-        this.setPozicija(boardFrame);
+        this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
         updateIstorijaPolozaja();
     }
 
@@ -57,7 +57,7 @@ public class Kralj extends Figure {
             }
             this.setRank(rank);
             this.setFile(file);
-            this.setPozicija(boardFrame);
+            this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
             nijeSePomerao = false;
             output = true;
 
@@ -68,10 +68,10 @@ public class Kralj extends Figure {
            if(nijeSePomerao && boardFrame.figura[boardFrame.getKoJeNaPotezu()][2].getNijeSePomerao()){
                 if(this.nisamUsahu(boardFrame) && this.nisamUsahuNakonPoteza(this.rank, 4, boardFrame) && this.nisamUsahuNakonPoteza(this.rank, 3, boardFrame)){
                     this.setFile(file);
-                    this.setPozicija(boardFrame);
+                    this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
                     nijeSePomerao = false;
                     boardFrame.figura[boardFrame.getKoJeNaPotezu()][2].setFile(4);
-                    boardFrame.figura[boardFrame.getKoJeNaPotezu()][2].setPozicija(boardFrame);
+                    boardFrame.figura[boardFrame.getKoJeNaPotezu()][2].setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
                     boardFrame.figura[boardFrame.getKoJeNaPotezu()][2].setNijeSePomerao(false);
                     output = true;
 
@@ -84,10 +84,10 @@ public class Kralj extends Figure {
             if(nijeSePomerao && boardFrame.figura[boardFrame.getKoJeNaPotezu()][3].getNijeSePomerao()){
                 if(this.nisamUsahu(boardFrame) && this.nisamUsahuNakonPoteza(this.rank, 6, boardFrame) && this.nisamUsahuNakonPoteza(this.rank, 7, boardFrame)){
                     this.setFile(file);
-                    this.setPozicija(boardFrame);
+                    this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
                     nijeSePomerao = false;
                     boardFrame.figura[boardFrame.getKoJeNaPotezu()][3].setFile(6);
-                    boardFrame.figura[boardFrame.getKoJeNaPotezu()][3].setPozicija(boardFrame);
+                    boardFrame.figura[boardFrame.getKoJeNaPotezu()][3].setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
                     boardFrame.figura[boardFrame.getKoJeNaPotezu()][3].setNijeSePomerao(false);
                     output = true;
 

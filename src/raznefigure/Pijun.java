@@ -11,7 +11,7 @@ public class Pijun extends Figure {
     public Pijun() {
     }
     public Pijun(MyFrame boardFrame) {
-        this.duzinaPolja = boardFrame.duzinaPolja;
+        this.duzinaPolja = boardFrame.getSquareLength();
         initDimenzije();
     }
 
@@ -30,7 +30,7 @@ public class Pijun extends Figure {
         } */
 
 
-        this.setPozicija(boardFrame);
+        this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Pijun extends Figure {
                           skloniFiguruSaTable(rankEnPassantPijuna, fileEnPassantPijuna, boardFrame);
                           this.setRank(rankGdeZavrsavamPosleEnPassant);
                           this.setFile(fileEnPassantPijuna);
-                          this.setPozicija(boardFrame);
+                          this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
                           nijeSePomerao = false;
                           output = true;
 

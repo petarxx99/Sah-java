@@ -20,7 +20,7 @@ public class Kraljica extends Figure {
         super(upisi0zaBelog1zaCrnog, boardFrame);
         rank = (upisi0zaBelog1zaCrnog == 0) ? (byte) 1 : (byte) 8;
         file = 4;
-        this.setPozicija(boardFrame);
+        this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Kraljica extends Figure {
             }
             this.setRank(rank);
             this.setFile(file);
-            this.setPozicija(boardFrame);
+            this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
             output = true;
         }
         return output;

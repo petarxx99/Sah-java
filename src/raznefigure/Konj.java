@@ -21,7 +21,7 @@ public class Konj extends Figure {
         super(upisi0zaBelog1zaCrnog, boardFrame);
         rank = (upisi0zaBelog1zaCrnog == 0) ? (byte) 1 : (byte) 8;
         file = (ovoJeLeviKonj) ? (byte) 2 : 7;
-        this.setPozicija(boardFrame);
+        this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
     }
 
 
@@ -52,7 +52,7 @@ public class Konj extends Figure {
             }
             this.setRank(rank);
             this.setFile(file);
-            this.setPozicija(boardFrame);   
+            this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());
             output = true;
 
         }

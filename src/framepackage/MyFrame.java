@@ -15,9 +15,11 @@ import java.util.ArrayList;
 public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
     // karakteristike table
-    public int duzinaPolja;
+    private int duzinaPolja;
+    public int getSquareLength(){return duzinaPolja;}
     public int duzinaTable;
-    public boolean whitesPerspective;
+    private boolean whitesPerspective;
+    public boolean isWhitesPerspective(){return whitesPerspective;}
 
     //------------------------------------------------------------------------------------------------
     public final static byte BROJ_FIGURA_JEDNE_BOJE = 16;
@@ -111,6 +113,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         addCosmeticsToTheLayeredPane(layeredPane);
         addPromButtonsToTheLayeredPane(layeredPane);
         addBoardBackgroundAndButtonsToTheLayeredPane(layeredPane);
+
 
         initFigure();
         for (int i = 0; i < 2; i++) {
@@ -305,7 +308,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     
     private void staviPromovisanuFiguruNaTablu(int cuvajRank, int cuvajFile, int indeksFigure){
         figura[koJeNaPotezu][indeksFigure].setRankFile(cuvajRank, cuvajFile);
-        figura[koJeNaPotezu][indeksFigure].setPozicija(this);
+        figura[koJeNaPotezu][indeksFigure].setPozicija(isWhitesPerspective(), getSquareLength());
         figura[koJeNaPotezu][indeksFigure].setBojaFigure(koJeNaPotezu);
         layeredPane.add(figura[koJeNaPotezu][indeksFigure], Integer.valueOf(1));
     }

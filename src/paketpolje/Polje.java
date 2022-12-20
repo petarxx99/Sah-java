@@ -12,21 +12,28 @@ public class Polje extends JButton {
 
 
     public void setDuzina(MyFrame boardFrame){
-        this.duzinaPolja = boardFrame.duzinaPolja;
+        this.duzinaPolja = boardFrame.getSquareLength();
         this.duzinaTable = 8 * duzinaPolja;
     }
     // -------------------------------------------------------------------------------
 
+    private void initDimensions(int squareLength){
+        this.duzinaPolja = squareLength;
+        this.duzinaTable = 8 * squareLength;
+    }
     byte rank;
     byte file;
 
     // set metode
 
     public void setPozicija(MyFrame boardFrame) {
-        if(boardFrame.whitesPerspective)
+        initDimensions(boardFrame.getSquareLength());
+
+        if(boardFrame.isWhitesPerspective()) {
             this.setBounds(duzinaPolja * (file - 1), duzinaTable - duzinaPolja * rank, duzinaPolja, duzinaPolja);
-         else
-             this.setBounds(duzinaTable - duzinaPolja * file, duzinaPolja * (rank-1), duzinaPolja, duzinaPolja);
+        }else {
+            this.setBounds(duzinaTable - duzinaPolja * file, duzinaPolja * (rank - 1), duzinaPolja, duzinaPolja);
+        }
     }
 
     public void setRankFile(int rank, int file) {

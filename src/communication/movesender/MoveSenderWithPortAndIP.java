@@ -36,8 +36,7 @@ public class MoveSenderWithPortAndIP implements MoveSender{
         }
 
         promotionThread = new PromotionThread(receiverOfMoves, startRank, startFile, destinationRank, destinationFile, promotion, this);
-        Thread threadPromotion = new Thread(promotionThread);
-        threadPromotion.start();
+        new Thread(promotionThread).start();
     }
 
     @Override
@@ -52,12 +51,14 @@ public class MoveSenderWithPortAndIP implements MoveSender{
         }
 
         Move moveToSend = new Move(startRank, startFile, endRank, endFile, promotion);
-        byte[] encodedMoveToSend = moveEncoder.encodeMove(moveToSend);
-
-        sendMove(encodedMoveToSend, opponentIpAddress, opponentPort);
-        receiverOfMoves.moveIsSentToOpponent(moveToSend);
-        System.out.printf("The move that was sent: %s \n", moveToSend.toString());
+        sendMove(moveToSend, opponentIpAddress, opponentPort);
+        notifyThatMoveWasSent(receiverOfMoves, moveToSend);
         receiveMove(receiverOfMoves);
+    }
+
+    private void notifyThatMoveWasSent(ReceiverOfChessMoves receiverOfMoves, Move sentMove){
+        receiverOfMoves.moveIsSentToOpponent(sentMove);
+        System.out.printf("The move that was sent: %s \n", sentMove.toString());
     }
 
     private void activatePort(){
@@ -97,14 +98,14 @@ public class MoveSenderWithPortAndIP implements MoveSender{
     }
 
 
-    private void sendMove(byte[] move, String ipAddress, int port){
-        try{
-            System.out.println("Pre socketSend");
-            Socket socketSend = new Socket(ipAddress, port);
-            System.out.println("Posle socketSend");
+    private void sendMove(Move moveToSend, String ipAddress, int port){
+        byte[] encodedMoveToSend = moveEncoder.encodeMove(moveToSend);
 
+        try{
+            System.out.println("About to send the move.");
+            Socket socketSend = new Socket(ipAddress, port);
             BufferedOutputStream bos = new BufferedOutputStream(socketSend.getOutputStream());
-            bos.write(move);
+            bos.write(encodedMoveToSend);
             bos.close();
            // socketSend.close();
 

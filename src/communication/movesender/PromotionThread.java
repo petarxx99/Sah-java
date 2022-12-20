@@ -37,7 +37,7 @@ public class PromotionThread implements Runnable {
                 Thread.sleep(50);
                 if(stopThread) return;
             }
-            moveSender.getAndSendMove(receiverOfMoves, START_RANK, START_FILE, END_RANK, END_FILE, promotion);
+            moveSender.sendAndReceiveMove(receiverOfMoves, START_RANK, START_FILE, END_RANK, END_FILE, promotion);
         } catch(Exception error){
             error.printStackTrace();
             error.getMessage();

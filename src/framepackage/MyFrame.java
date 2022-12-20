@@ -181,6 +181,25 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         }
     }
 
+    private void sendAndReceiveMove(boolean moveWasPlayed, boolean promotionHasOccured){
+        if(promotionHasOccured){
+            moveSender.waitForPromotionAndThenSendMove(this, startRank, startFile, destinationRank, destinationFile, promotionButtonNumber);
+        } else if (moveWasPlayed) {
+            Thread threadGetAndSendMove = new Thread(() -> sendAndReceiveMoveWithoutWaitingForPromotion(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber));
+            threadGetAndSendMove.start();
+
+        }
+
+    }
+
+    private void sendAndReceiveMoveWithoutWaitingForPromotion(final byte START_RANK, final byte START_FILE, final byte END_RANK, final byte END_FILE, Promotion promotion){
+        try{
+            moveSender.sendAndReceiveMove(this, START_RANK, START_FILE, END_RANK, END_FILE, promotion);
+        }catch(Exception e){
+            e.getMessage();
+            e.printStackTrace();
+        }
+    }
 
     public void obavestiDaJePromocijaGotova(Promotion promotion){
         promotionButtonClicked = true;
@@ -351,25 +370,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
        }
    }
 
-    private void sendAndReceiveMove(boolean moveWasPlayed, boolean promotionHasOccured){
-         if(promotionHasOccured){
-                 moveSender.waitForPromotionAndThenSendMove(this, startRank, startFile, destinationRank, destinationFile, promotionButtonNumber);
-         } else if (moveWasPlayed) {
-                 Thread threadGetAndSendMove = new Thread(() -> sendAndReceiveMoveWithoutWaitingForPromotion(startRank, startFile, destinationRank, destinationFile, promotionButtonNumber));
-                 threadGetAndSendMove.start();
 
-        }
-                                                
-    }
-    
-    private void sendAndReceiveMoveWithoutWaitingForPromotion(final byte START_RANK, final byte START_FILE, final byte END_RANK, final byte END_FILE, Promotion promotion){
-        try{
-            moveSender.getAndSendMove(this, START_RANK, START_FILE, END_RANK, END_FILE, promotion);
-        }catch(Exception e){
-            e.getMessage();
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void moveIsSentToOpponent(Move aMove){

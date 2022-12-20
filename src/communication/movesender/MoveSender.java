@@ -42,7 +42,7 @@ public class MoveSender {
         promotionThread.promotionHasOccured(promotion);
     }
 
-    public void getAndSendMove(ReceiverOfChessMoves receiverOfMoves, int startRank, int startFile, int endRank, int endFile, Promotion promotion) throws Exception {
+    public void sendAndReceiveMove(ReceiverOfChessMoves receiverOfMoves, int startRank, int startFile, int endRank, int endFile, Promotion promotion) throws Exception {
         if(promotion == null){
             throw new Exception("Promotion is null.");
         }

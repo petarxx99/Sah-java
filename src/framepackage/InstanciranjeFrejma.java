@@ -339,8 +339,8 @@ public class InstanciranjeFrejma {
             int opponentPortTry = Integer.parseInt(unetProtivnikovPort);
             int mojPortTry = Integer.parseInt(unetMojPort);
 
-            if(opponentPortTry>2000 && opponentPortTry < 6000) opponentPortTry = 5000;
-            if (mojPortTry>2000 && mojPortTry < 6000) mojPortTry = 5000;
+            if(opponentPortTry<2000 || opponentPortTry > 6000) opponentPortTry = 5000;
+            if (mojPortTry<2000 || mojPortTry > 6000) mojPortTry = 5000;
 
             dataToReturn.init(mojPortTry, opponentPortTry, OPPONENTS_IP);
             JOptionPane.showMessageDialog(null, "opponent IP = " + OPPONENTS_IP + ", opponent port = " + opponentPortTry + ", my port = " + mojPortTry);

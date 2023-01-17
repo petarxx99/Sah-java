@@ -24,6 +24,9 @@ public class InstanciranjeFrejma {
     JButton buttonUnesiSamOption;
     JTextField ipTextField;
 
+    final String DEFAULT_OPPONENTS_IP_ADDRESS = "127.0.0.1";
+    final int DEFAULT_OPPONENTS_PORT = 5003;
+    final int MY_DEFAULT_PORT = 5000;
 
 
     public static HashMap<String, String> opponentsHashMap = new HashMap<>() {
@@ -49,10 +52,13 @@ public class InstanciranjeFrejma {
             }
             case PLAYER_ON_ANOTHER_PC:{
                 WhichPcEnum whichPc = askWhichPC();
+                MoveEncoder moveEncoder = new MoveEncoder3bytes();
                 if(whichPc == WhichPcEnum.CUSTOM_IP_AND_PORT){
                     IpAddressAndPortData ipPort = askForOpponentIPandPort();
-                    MoveEncoder moveEncoder = new MoveEncoder3bytes();
                     moveSender = new MoveSenderWithPortAndIP(opponent, moveEncoder, opponentsColor, ipPort.opponentsIpAddress, ipPort.opponentsPort, "localhost", ipPort.myPort);
+                }
+                if (whichPc == WhichPcEnum.DEFAULT_PC) {
+                    moveSender = new MoveSenderWithPortAndIP(opponent, moveEncoder, opponentsColor, DEFAULT_OPPONENTS_IP_ADDRESS, DEFAULT_OPPONENTS_PORT, "localhost", MY_DEFAULT_PORT);
                 }
                 break;
             }

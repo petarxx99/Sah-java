@@ -425,7 +425,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     }
 
     private void playANONPromotingMove(Move aMove){
-        final boolean PIECE_WAS_CAPTURED = (new Figure()).skloniFiguruSaTable(aMove.END_RANK, aMove.END_FILE, this);
+
         final int PIECE_INDEX = findPieceIndex(aMove.START_RANK, aMove.START_FILE, koJeNaPotezu);
         // Zbog en passant ovo pisem, promenljiva se menja u kodu move pijuna, ako se pijun pomeri dva polja napred.
         pijun2PoljaNapredUovomPotezu = false;
@@ -439,7 +439,9 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
 
     }
 
-    private void opponentsMoveWasntPlayed(Move aMove){}
+    private void opponentsMoveWasntPlayed(Move aMove){
+        JOptionPane.showMessageDialog(null, "Opponents move wasn't played.");
+    }
     public byte getColorOfPlayerWhoDoesntHaveTheTurn(){
         if(koJeNaPotezu == 0) return (byte)1;
         if(koJeNaPotezu == 1) return (byte)0;

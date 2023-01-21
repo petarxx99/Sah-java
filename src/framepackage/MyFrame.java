@@ -440,7 +440,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     }
 
     private void opponentsMoveWasntPlayed(Move aMove){
-        JOptionPane.showMessageDialog(null, "Opponents move wasn't played.");
+        JOptionPane.showMessageDialog(null, "Opponents move wasn't played. " + aMove);
     }
     public byte getColorOfPlayerWhoDoesntHaveTheTurn(){
         if(koJeNaPotezu == 0) return (byte)1;

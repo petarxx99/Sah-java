@@ -85,7 +85,7 @@ public class Pijun extends Figure {
         boolean output = false;
         byte pocetniRank = (byte)this.rank;
         byte pocetniFile = (byte)this.file;
-
+        byte fileEnPassantPijuna = boardFrame.getFilePijunaKojiSePomerio2Polja();
 
         boolean uslovSmera;
         if(boardFrame.getKoJeNaPotezu() == 0){
@@ -124,18 +124,19 @@ public class Pijun extends Figure {
 
         } // PRESTAJE BLOK IF STATEMENT-A.
 
-        byte fileEnPassantPijuna = boardFrame.getFilePijunaKojiSePomerio2Polja();
+
         if (fileEnPassantPijuna == MyFrame.INVALID_FILE) {
             return output;  // EN PASSANT NE MOZE, JER NIJE ODIGRANO 2 POLJA NAPRED PESAKOM U PROSLOM POTEZU, TJ.
         }
         byte rankSaKogMozeEnPassant = (byte)(5 - boardFrame.getKoJeNaPotezu());
         byte rankGdeZavrsavamPosleEnPassant = (boardFrame.getKoJeNaPotezu() == 0)? (byte)6 : (byte)3;
-        byte rankEnPassantPijuna = this.rank;
+        byte rankPojedenogPijunaTokomEnPassant = rankSaKogMozeEnPassant;
 
-        if((Math.abs(fileEnPassantPijuna - this.file) == 1)
-                && (rankSaKogMozeEnPassant == this.rank)
+        if((Math.abs(fileEnPassantPijuna - pocetniFile) == 1)
+                && fileEnPassantPijuna == file
+                && (rankSaKogMozeEnPassant == pocetniRank)
                    && nisamUsahuNakonPoteza(rankGdeZavrsavamPosleEnPassant, fileEnPassantPijuna, boardFrame)) {
-                          skloniFiguruSaTable(rankEnPassantPijuna, fileEnPassantPijuna, boardFrame);
+                          skloniFiguruSaTable(rankPojedenogPijunaTokomEnPassant, fileEnPassantPijuna, boardFrame);
                           this.setRank(rankGdeZavrsavamPosleEnPassant);
                           this.setFile(fileEnPassantPijuna);
                           this.setPozicija(boardFrame.isWhitesPerspective(), boardFrame.getSquareLength());

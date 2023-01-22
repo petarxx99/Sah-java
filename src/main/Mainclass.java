@@ -1,4 +1,6 @@
 package src.main;
+import src.menu.Menu;
+import src.menu.MockGameEndedListener;
 import src.paketfigure.*;
 import src.paketpolje.Polje;
 import src.framepackage.*;
@@ -18,7 +20,9 @@ public class Mainclass {
     public static void main(String[] args){
 
         int duzinaPolja = 60;
-        InstanciranjeFrejma instanciranjeFrejma = new InstanciranjeFrejma(duzinaPolja);
+        GameConfiguration configuration = new InstanciranjeFrejma(duzinaPolja);
+        ChessGame chessGame = new MyFrame();
+        var menu = new Menu(configuration, chessGame);
     }
 }
 

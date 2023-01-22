@@ -7,6 +7,7 @@ import src.constants.ChessConstants;
 import src.communication.movesender.MoveSender;
 import src.communication.encoding.MoveEncoder;
 import src.communication.encoding.MoveEncoder3bytes;
+import src.menu.GameEndedListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,8 +15,9 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 
 
-public class InstanciranjeFrejma {
+public class InstanciranjeFrejma implements GameConfiguration{
 
+    private int duzinaPolja;
     private boolean colorQuestionAnswered = false, opponentQAnswered, pcQuestion;
     boolean askWhichPCAnswered = false;
     static JButton buttonWhite, buttonBlack, buttonDefaultOption;
@@ -37,8 +39,17 @@ public class InstanciranjeFrejma {
         }
     };
 
+    public InstanciranjeFrejma(int duzinaPolja) {
+        this.duzinaPolja = duzinaPolja;
+    }
 
-    public InstanciranjeFrejma(int duzinaPolja){
+    @Override
+    public void startNewGameConfiguration(ChessGame chessGame, Set<GameEndedListener> gameEndedListeners){
+        var configuration = new InstanciranjeFrejma(duzinaPolja);
+        configuration.startGameConfiguration(chessGame, gameEndedListeners);
+    }
+
+    public void startGameConfiguration(ChessGame chessGame, Set<GameEndedListener> gameEndedListeners){
         Byte opponentsColor = askWhiteOrBlackPieces();
         boolean whitesPerspective = opponentsColor == ChessConstants.BLACK;
 
@@ -67,7 +78,7 @@ public class InstanciranjeFrejma {
             }
         }
 
-        MyFrame chessGame = new MyFrame(moveSender, opponent, whitesPerspective, opponentsColor, duzinaPolja);
+        chessGame.initializeGame(moveSender, opponent, whitesPerspective, opponentsColor, duzinaPolja, gameEndedListeners);
         chessGame.startGame();
     }
 

@@ -3,6 +3,7 @@ package src.framepackage;
 import src.communication.*;
 import src.communication.movesender.MoveSender;
 import src.constants.ChessConstants;
+import src.menu.GameEndedListener;
 import src.paketfigure.Figure;
 import src.paketpolje.Polje;
 import src.raznefigure.*;
@@ -10,10 +11,15 @@ import src.raznefigure.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class MyFrame extends JFrame implements ReceiverOfChessMoves {
+public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
 
+    private HashSet<GameEndedListener> gameEndedListeners = new HashSet<>();
     // karakteristike table
     private int duzinaPolja;
     public int getSquareLength(){return duzinaPolja;}
@@ -86,22 +92,34 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
     public boolean promotionHappened = false;
     public boolean promotionButtonClicked = false;  // SKLONI DUGMICE PROMOCIJE METODA GA MENJA
     public Promotion promotionButtonNumber = Promotion.NO_PROMOTION;
-    public final Opponents opponent;
+    private Opponents opponent;
     private byte opponentsColor = ChessConstants.BLACK_TO_MOVE;
 
 
     // konstruktor
-    public MyFrame(MoveSender moveSender, Opponents opponent, boolean whitesPerspective, byte opponentsColor, int duzinaPolja){
+    public MyFrame(){}
+
+    @Override
+    public void initializeGame(MoveSender moveSender, Opponents opponent, boolean whitesPerspective, byte opponentsColor, int duzinaPolja, Set<GameEndedListener> gameEndedListeners){
         this.opponentsColor = opponentsColor;
         this.moveSender = moveSender;
         this.duzinaPolja = duzinaPolja;
         this.duzinaTable = 8 * duzinaPolja;
         this.whitesPerspective = whitesPerspective;
         this.opponent = opponent;
+        this.gameEndedListeners.addAll(gameEndedListeners);
 
         this.setSize(700, 700);
         this.setLayout(null);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        var thisObject = this;
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisObject.dispose();
+                gameEndedListeners.forEach(listener -> listener.gameHasEnded(new MyFrame()));
+            }
+        });
 
         layeredPane = new JLayeredPane();
         layeredPane.setBounds(0, 0, 700, 700);
@@ -123,6 +141,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         this.add(layeredPane);
     }
 
+    @Override
     public void startGame(){
         waitForFirstMoveIfIamBlackAndIfIPlayAgainstAwayOpponent(opponent, opponentsColor, moveSender);
         this.setVisible(true);
@@ -796,5 +815,20 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         return filePijunaKojiSePomerio2Polja;
     }
 
+
+    @Override
+    public void addGameEndedListener(GameEndedListener listener){
+        gameEndedListeners.add(listener);
+    }
+
+    @Override
+    public boolean removeGameEndedListener(GameEndedListener listener){
+        return gameEndedListeners.remove(listener);
+    }
+
+    @Override
+    public void addGameEndedListeners(Set<GameEndedListener> listeners){
+        this.gameEndedListeners.addAll(listeners);
+    }
 
 }

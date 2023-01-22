@@ -171,6 +171,8 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves {
         else  {
             if (jedemSopstvenuFiguru(rank, file, koJeNaPotezu)){
                 indeksKliknuteFigure = indeksIgraceveFigureNaPolju(rank, file, koJeNaPotezu);
+                startRank = rank;
+                startFile = file;
                 return;
             }
             boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);

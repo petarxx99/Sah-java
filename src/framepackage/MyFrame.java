@@ -117,6 +117,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
             @Override
             public void windowClosing(WindowEvent e) {
                 thisObject.dispose();
+                moveSender.noLongerNeeded(thisObject);
                 gameEndedListeners.forEach(listener -> listener.gameHasEnded(new MyFrame()));
             }
         });

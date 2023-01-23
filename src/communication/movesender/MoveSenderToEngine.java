@@ -11,6 +11,8 @@ public class MoveSenderToEngine implements MoveSender{
     }
 
     @Override
+    public void noLongerNeeded(ReceiverOfChessMoves receiverOfChessMoves){}
+    @Override
     public void promotionHasOccured(Promotion promotion) {
 
     }

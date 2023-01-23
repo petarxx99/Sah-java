@@ -126,4 +126,12 @@ public class MoveSenderWithPortAndIP implements MoveSender{
     }
 
 
+    @Override
+    public void noLongerNeeded(ReceiverOfChessMoves receiverOfChessMoves){
+        try{
+            serverSocket.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 }

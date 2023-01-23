@@ -25,5 +25,6 @@ public interface MoveSender {
 
     public void receiveMove(ReceiverOfChessMoves receiverOfMoves);
 
+    public void noLongerNeeded(ReceiverOfChessMoves receiverOfChessMoves);
 
 }

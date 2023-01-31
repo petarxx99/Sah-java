@@ -30,6 +30,8 @@ public class InstanciranjeFrejma implements GameConfiguration{
     final int DEFAULT_OPPONENTS_PORT = 5003;
     final int MY_DEFAULT_PORT = 5000;
 
+    final static int DEFAULT_ENGINE_PORT = 5003;
+    final static String DEFAULT_ENGINE_IP_ADDRESS = "127.0.0.1";
 
     public static HashMap<String, String> opponentsHashMap = new HashMap<>() {
         {
@@ -58,7 +60,8 @@ public class InstanciranjeFrejma implements GameConfiguration{
 
         switch(opponent){
             case CHESS_ENGINE:{
-                moveSender = new MoveSenderToEngine();
+                MoveEncoder moveEncoder = new MoveEncoder3bytes();
+                moveSender = new MoveSenderWithPortAndIP(opponent, moveEncoder, opponentsColor, DEFAULT_ENGINE_IP_ADDRESS, DEFAULT_ENGINE_PORT,"localhost", MY_DEFAULT_PORT);
                 break;
             }
             case PLAYER_ON_ANOTHER_PC:{

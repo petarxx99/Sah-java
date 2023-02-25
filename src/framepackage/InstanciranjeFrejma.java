@@ -1,13 +1,13 @@
-package src.framepackage;
+package framepackage;
 
-import src.communication.movesender.MoveSenderMock;
-import src.communication.movesender.MoveSenderToEngine;
-import src.communication.movesender.MoveSenderWithPortAndIP;
-import src.constants.ChessConstants;
-import src.communication.movesender.MoveSender;
-import src.communication.encoding.MoveEncoder;
-import src.communication.encoding.MoveEncoder3bytes;
-import src.menu.GameEndedListener;
+import communication.movesender.MoveSenderMock;
+import communication.movesender.MoveSenderWithPortAndIP;
+import constants.ChessConstants;
+import communication.movesender.MoveSender;
+import communication.encoding.MoveEncoder;
+import communication.encoding.MoveEncoder3bytes;
+import menu.GameEndedListener;
+import framepackage.ChessGame;
 
 import javax.swing.*;
 import java.awt.*;

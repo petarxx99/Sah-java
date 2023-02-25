@@ -1,4 +1,4 @@
-package src.communication;
+package communication;
 
 public interface ReceiverOfChessMoves {
     public void receiveOpponentsMove(Move aMove);

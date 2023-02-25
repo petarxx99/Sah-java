@@ -1,7 +1,7 @@
-package src.communication.encoding;
+package communication.encoding;
 
-import src.communication.Move;
-import src.communication.Promotion;
+import communication.Move;
+import communication.Promotion;
 
 public class MoveEncoder3bytes implements MoveEncoder{
     public static final byte NO_PROMOTION = -1, PROMOTE_QUEEN = 0, PROMOTE_ROOK = 1, PROMOTE_BISHOP = 2, PROMOTE_KNIGHT = 3;

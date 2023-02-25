@@ -1,7 +1,7 @@
-package src.raznefigure;
+package raznefigure;
 
-import src.paketfigure.Figure;
-import src.framepackage.*;
+import paketfigure.Figure;
+import framepackage.*;
 
 
 // ---------------------------------------------------------------------

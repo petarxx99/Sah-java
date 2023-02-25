@@ -1,10 +1,10 @@
-package src.communication.movesender;
+package communication.movesender;
 
-import src.communication.Move;
-import src.communication.Promotion;
-import src.communication.ReceiverOfChessMoves;
-import src.communication.encoding.MoveEncoder;
-import src.framepackage.*;
+import communication.Move;
+import communication.Promotion;
+import communication.ReceiverOfChessMoves;
+import communication.encoding.MoveEncoder;
+import framepackage.*;
 import java.net.*;
 import java.io.*;
 

@@ -1,12 +1,13 @@
-package src.framepackage;
+package framepackage;
 
-import src.communication.*;
-import src.communication.movesender.MoveSender;
-import src.constants.ChessConstants;
-import src.menu.GameEndedListener;
-import src.paketfigure.Figure;
-import src.paketpolje.Polje;
-import src.raznefigure.*;
+import communication.*;
+import communication.movesender.MoveSender;
+import constants.ChessConstants;
+import menu.GameEndedListener;
+import paketfigure.Figure;
+import paketpolje.Polje;
+import raznefigure.*;
+import framepackage.ChessGame;
 
 
 import javax.swing.*;

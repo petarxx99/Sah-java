@@ -1,4 +1,4 @@
-package src.constants;
+package constants;
 
 public class ChessConstants {
     public static final byte WHITE_TO_MOVE = 0;

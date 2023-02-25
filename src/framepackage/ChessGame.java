@@ -1,7 +1,7 @@
-package src.framepackage;
+package framepackage;
 
-import src.communication.movesender.MoveSender;
-import src.menu.GameEndedListener;
+import communication.movesender.MoveSender;
+import menu.GameEndedListener;
 
 import java.util.Set;
 

@@ -1,8 +1,8 @@
-package src.paketfigure;
+package paketfigure;
 
 
-import src.constants.ChessConstants;
-import src.framepackage.*;
+import constants.ChessConstants;
+import framepackage.*;
 
 import javax.swing.*;
 import java.util.*;

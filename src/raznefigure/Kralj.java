@@ -1,9 +1,9 @@
-package src.raznefigure;
+package raznefigure;
 
 
-import src.paketfigure.Figure;
-import src.raznefigure.*;
-import src.framepackage.*;
+import paketfigure.Figure;
+import raznefigure.*;
+import framepackage.*;
 
 import java.awt.*;
 import java.awt.event.*;

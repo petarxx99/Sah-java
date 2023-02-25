@@ -1,6 +1,6 @@
-package src.communication.encoding;
+package communication.encoding;
 
-import src.communication.Move;
+import communication.Move;
 
 public interface MoveEncoder {
 

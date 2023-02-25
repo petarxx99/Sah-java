@@ -1,7 +1,7 @@
-package src.paketpolje;
+package paketpolje;
 
 import javax.swing.*;
-import src.framepackage.*;
+import framepackage.*;
 
 public class Polje extends JButton {
 

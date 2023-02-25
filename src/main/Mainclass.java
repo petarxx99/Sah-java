@@ -1,11 +1,9 @@
-package src.main;
-import src.menu.Menu;
-import src.menu.MockGameEndedListener;
-import src.paketfigure.*;
-import src.paketpolje.Polje;
-import src.framepackage.*;
-
-import java.util.*;
+package main;
+import framepackage.GameConfiguration;
+import framepackage.InstanciranjeFrejma;
+import framepackage.MyFrame;
+import menu.Menu;
+import framepackage.ChessGame;
 
 /*
     From the main menu, select File | Project Structure | Project Settings | Project.

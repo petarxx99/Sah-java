@@ -1,4 +1,4 @@
-package src.framepackage;
+package framepackage;
 import java.awt.*;
 
 public class ChoiceButton extends Button {

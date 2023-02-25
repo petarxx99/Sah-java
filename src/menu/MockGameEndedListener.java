@@ -1,6 +1,6 @@
-package src.menu;
+package menu;
 
-import src.framepackage.ChessGame;
+import framepackage.ChessGame;
 
 public class MockGameEndedListener implements GameEndedListener{
 

@@ -1,6 +1,6 @@
-package src.menu;
+package menu;
 
-import src.framepackage.ChessGame;
+import framepackage.ChessGame;
 
 public interface GameEndedListener {
     public void gameHasEnded(ChessGame newChessGame);

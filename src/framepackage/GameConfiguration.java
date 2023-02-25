@@ -1,8 +1,8 @@
-package src.framepackage;
+package framepackage;
 
-import src.menu.GameEndedListener;
+import menu.GameEndedListener;
+import framepackage.ChessGame;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public interface GameConfiguration {

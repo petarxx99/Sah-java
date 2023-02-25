@@ -1,7 +1,7 @@
-package src.communication.movesender;
+package communication.movesender;
 
-import src.communication.Promotion;
-import src.communication.ReceiverOfChessMoves;
+import communication.Promotion;
+import communication.ReceiverOfChessMoves;
 
 public class MoveSenderMock implements MoveSender{
 

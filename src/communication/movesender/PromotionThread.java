@@ -1,8 +1,8 @@
-package src.communication.movesender;
+package communication.movesender;
 
-import src.communication.movesender.MoveSender;
-import src.communication.Promotion;
-import src.communication.ReceiverOfChessMoves;
+import communication.movesender.MoveSender;
+import communication.Promotion;
+import communication.ReceiverOfChessMoves;
 
 public class PromotionThread implements Runnable {
     final byte START_RANK, START_FILE, END_RANK, END_FILE;

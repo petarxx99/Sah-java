@@ -1,12 +1,10 @@
-package src.menu;
+package menu;
 
-import src.framepackage.ChessGame;
-import src.framepackage.GameConfiguration;
-import src.framepackage.InstanciranjeFrejma;
+import framepackage.ChessGame;
+import framepackage.GameConfiguration;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
 import java.util.HashSet;
 
 public class Menu implements GameEndedListener {

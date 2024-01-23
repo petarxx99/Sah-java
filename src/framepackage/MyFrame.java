@@ -5,6 +5,7 @@ import communication.movesender.MoveSender;
 import constants.ChessConstants;
 import menu.GameEndedListener;
 import paketfigure.Figure;
+import paketpolje.BackgroundSquare;
 import paketpolje.Polje;
 import raznefigure.*;
 import framepackage.ChessGame;
@@ -15,6 +16,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +29,9 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
     public int duzinaTable;
     private boolean whitesPerspective;
     public boolean isWhitesPerspective(){return whitesPerspective;}
+
+    private static Color COLOR_BLACK = new Color(50, 100, 50);
+    private static Color HIGHLIGHT_COLOR = Color.YELLOW;
 
     //------------------------------------------------------------------------------------------------
     public final static byte BROJ_FIGURA_JEDNE_BOJE = 16;
@@ -52,6 +57,10 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
     public boolean pijun2PoljaNapredUovomPotezu = false;
     //public boolean pomerioSamPesaka2Polja = false;
     public  boolean choosingPromotionPiece = false;
+
+    private BackgroundSquare previousMoveSquares[] = null;
+
+    private BackgroundSquare clickedHighlightedSquare = null;
 
     // ------------------------------------------------------
     public JLayeredPane layeredPane;
@@ -157,7 +166,37 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
         }
     }
 
-    // ovde prestaje konstruktor
+    private void highlightNewlyClickedSquare(int rank, int file){
+        removeHighlightFromClickedSquare();
+        clickedHighlightedSquare = new BackgroundSquare(poljePozadina[rank][file].getBackground(), poljePozadina[rank][file]);
+        poljePozadina[rank][file].setBackground(HIGHLIGHT_COLOR);
+    }
+
+    private void removeHighlightFromClickedSquare(){
+        if (clickedHighlightedSquare != null){
+            clickedHighlightedSquare.returnDefaultColor();
+        }
+
+        clickedHighlightedSquare = null;
+    }
+
+    private void highlightNewlyMovedSquares(int rankOfSquare1,
+                                            int fileOfSquare1,
+                                            int rankOfSquare2,
+                                            int fileOfSquare2){
+        if (previousMoveSquares != null){
+            Arrays.stream(previousMoveSquares).forEach(BackgroundSquare::returnDefaultColor);
+        } else {
+            previousMoveSquares = new BackgroundSquare[2];
+        }
+
+        previousMoveSquares[0] = new BackgroundSquare(poljePozadina[rankOfSquare1][fileOfSquare1].getBackground(), poljePozadina[rankOfSquare1][fileOfSquare1]);
+        previousMoveSquares[1] = new BackgroundSquare(poljePozadina[rankOfSquare2][fileOfSquare2].getBackground(), poljePozadina[rankOfSquare2][fileOfSquare2]);
+
+        poljePozadina[rankOfSquare1][fileOfSquare1].setBackground(HIGHLIGHT_COLOR);
+        poljePozadina[rankOfSquare2][fileOfSquare2].setBackground(HIGHLIGHT_COLOR);
+    }
+
 
     /*
     This is a callback method. This method is called when a chess square is clicked.
@@ -173,6 +212,8 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
  DRUGI SLUCAJ: kliknuo sam na polje gde zelim da figura ode. */
 // Sada obradjujem slucaj da smo kliknuli na polje s kojeg zelimo da pomerimo figuru (1. SLUCAJ).
 
+        removeHighlightFromClickedSquare();
+
         if (!ovoJePoljeDestinacije) {
             resetBoardPromenljive();
             showWhoseTurnItIs();
@@ -184,6 +225,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
                     indeksKliknuteFigure = (byte) i;
                     startRank = (byte) rank;
                     startFile = (byte) file;
+                    highlightNewlyClickedSquare(rank, file);
                     break;
                 }
             }
@@ -194,6 +236,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
                 indeksKliknuteFigure = indeksIgraceveFigureNaPolju(rank, file, koJeNaPotezu);
                 startRank = rank;
                 startFile = file;
+                highlightNewlyClickedSquare(rank, file);
                 return;
             }
             boolean moveWasPlayed = pokusajOdigratiPotez(rank, file, indeksKliknuteFigure);
@@ -354,8 +397,12 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
                                     destinationRank = (byte)rank;
                                     destinationFile = (byte)file;
 
+                                    int startRank = figura[koJeNaPotezu][indeksKliknuteFigure].getRank();
+                                    int startFile = figura[koJeNaPotezu][indeksKliknuteFigure].getFile();
+
                                     moveWasPlayed = figura[koJeNaPotezu][indeksKliknuteFigure].Move(rank, file, this);
                                     if (moveWasPlayed && !promotionHappened){
+                                        highlightNewlyMovedSquares(rank, file, startRank, startFile);
                                         updateIstorijaPolozajaFigura();
                                         koJeNaPotezu = Figure.invert(koJeNaPotezu);
                                         brojPoteza++;
@@ -392,6 +439,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
            dugmiciPromocije[i].setVisible(true);
            System.out.println("Showing promotion buttons.");
        }
+
    }
 
 
@@ -433,6 +481,8 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
         return -1; // Nesto nije bilo kako treba.
     }
 
+
+
     public void playOpponentsMove(Move aMove){
         if(aMove.PROMOTION == Promotion.NO_PROMOTION){
             playANONPromotingMove(aMove);
@@ -440,10 +490,6 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
             playPromotingMove(aMove);
         }
 
-        ovoJePoljeDestinacije = false;
-        //updateIstorijaPolozajaFigura();
-        koJeNaPotezu = Figure.invert(koJeNaPotezu);
-        brojPoteza++;
         labelObavestenja();
     }
 
@@ -455,7 +501,14 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
         boolean moveWasPlayed = figura[koJeNaPotezu][PIECE_INDEX].Move(aMove.END_RANK, aMove.END_FILE, this);
         if(!moveWasPlayed){
             opponentsMoveWasntPlayed(aMove);
+        } else {
+            highlightNewlyMovedSquares(aMove.START_RANK, aMove.START_FILE, aMove.END_RANK, aMove.END_FILE);
+            ovoJePoljeDestinacije = false;
+            //updateIstorijaPolozajaFigura();
+            koJeNaPotezu = Figure.invert(koJeNaPotezu);
+            brojPoteza++;
         }
+
         if(!pijun2PoljaNapredUovomPotezu){
             filePijunaKojiSePomerio2Polja = MyFrame.INVALID_FILE;
         }
@@ -473,6 +526,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
     private void playPromotingMove(Move aMove){
         int whoseTurnItIs = getKoJeNaPotezu();
         int pieceIndex = findPieceIndex(aMove.START_RANK, aMove.START_FILE, whoseTurnItIs);
+        highlightNewlyMovedSquares(aMove.START_RANK, aMove.START_FILE, aMove.END_RANK, aMove.END_FILE);
 
         boolean pieceWasCaptured = (new Figure()).skloniFiguruSaTable(
                 aMove.END_RANK,
@@ -483,6 +537,8 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
                 aMove.END_RANK, this);
 
         this.filePijunaKojiSePomerio2Polja = MyFrame.INVALID_FILE;
+
+        highlightNewlyMovedSquares(aMove.START_RANK, aMove.START_FILE, aMove.END_RANK, aMove.END_FILE);
 
         switch (aMove.PROMOTION) {
             case PROMOTE_QUEEN: {
@@ -505,6 +561,11 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
             default: {
             }
         }
+
+        ovoJePoljeDestinacije = false;
+        //updateIstorijaPolozajaFigura();
+        koJeNaPotezu = Figure.invert(koJeNaPotezu);
+        brojPoteza++;
     }
 
     @Override
@@ -614,7 +675,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
                 polje[rank][file] = new Polje();
 
                 if ((rank + file) % 2 == 0) {
-                    poljePozadina[rank][file].setBackground(new Color(50, 100, 50));
+                    poljePozadina[rank][file].setBackground(COLOR_BLACK);
                 } else {
                     poljePozadina[rank][file].setBackground(Color.WHITE);
                 }

@@ -31,7 +31,7 @@ public class MyFrame extends JFrame implements ReceiverOfChessMoves, ChessGame {
     public boolean isWhitesPerspective(){return whitesPerspective;}
 
     private static Color COLOR_BLACK = new Color(50, 100, 50);
-    private static Color HIGHLIGHT_COLOR = Color.YELLOW;
+    private static Color HIGHLIGHT_COLOR = new Color(255, 215, 50);
 
     //------------------------------------------------------------------------------------------------
     public final static byte BROJ_FIGURA_JEDNE_BOJE = 16;
